@@ -5,7 +5,7 @@ import authRouter from "./routes/Auth.js";
 import cors from "cors";
 import adminRouter from "./routes/admin.js";
 // import router from "./routes/router.js";
-import checkRouter from "./routes/Check.js";
+import checkRouter from "./routes/check.js";
 import cartRouter from "./routes/cart.js";
 import cookieParser from "cookie-parser";
 
@@ -22,7 +22,7 @@ app.use(
   })
 );
 
-await connectToDB();
+ connectToDB();
 
 app.use("/product", productRouter);
 app.use("/user", authRouter);

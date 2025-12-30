@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "esbuild index.js --bundle --outfile=dist/bundle.js --platform=node --target=node18"
   },
   "author": "Bharat pareek",
   "license": "ISC",
@@ -22,5 +23,8 @@
     "mongoose": "^9.0.1",
     "multer": "^2.0.2",
     "nodemon": "^3.1.11"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.2"
   }
 }
