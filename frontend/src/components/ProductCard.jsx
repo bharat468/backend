@@ -1,18 +1,13 @@
 import { PiCurrencyInrLight } from "react-icons/pi";
 import { Link } from "react-router-dom";
+import instance from "../axiosConfig"; // 🌍 import instance
 
 function ProductCard({ product, slug }) {
-  // 💡 backend URL auto switch (local & deploy)
-  const backendURL =
-    window.location.hostname === "localhost"
-      ? "http://localhost:3000"
-      : "https://backend-b7x0.onrender.com";
-
   return (
     <div className="productCard">
       <Link to={`/product/${slug}`}>
         <img
-          src={`${backendURL}/${product.image}`} // 🧠 auto image base URL
+          src={`${instance.defaults.baseURL}/${product.image}`} // ⭐ instance BASE URL
           alt={product.name}
         />
       </Link>

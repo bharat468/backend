@@ -15,12 +15,6 @@ const SingleProduct = () => {
     text: "",
   });
 
-  // 🌍 backend URL auto-switch (local + deploy)
-  const backendURL =
-    window.location.hostname === "localhost"
-      ? "http://localhost:3000"
-      : "https://backend-b7x0.onrender.com";
-
   async function getSingleData() {
     try {
       setLoading(true);
@@ -69,7 +63,7 @@ const SingleProduct = () => {
 
       <div className="single-product-image">
         <img
-          src={`${backendURL}/${product.image}`}  // ⭐ FIXED HERE
+          src={`${instance.defaults.baseURL}/${product.image}`}  // ⭐ HERE
           alt={product.name}
         />
       </div>

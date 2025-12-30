@@ -1,5 +1,5 @@
-import axios from "axios";
-import { useNavigate, Link, useParams } from "react-router-dom";
+import instance from "../axiosConfig"; // ⭐ axios import replace
+import { useNavigate } from "react-router-dom";
 import "../App.css";
 import { useAuth } from "../contexts/AuthProvider";
 import { useState } from "react";
@@ -21,27 +21,22 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/user/login",
-        data,
-        {
-          withCredentials: true,
-        }
-      );
+      // ⭐ localhost हट गया — अब instance से post होगा
+      const response = await instance.post("/user/login", data);
 
-      if (response.status == 200) {
+      if (response.status === 200) {
         checkIsLoggedIn();
+        
+        // redirect to nextPage if exists
         const params1 = new URLSearchParams(window.location.search);
-        console.log(params1);
         for (const [key, value] of params1.entries()) {
-          if (key === "nextPage") navigate(value);
+          if (key === "nextPage") return navigate(value);
         }
-      }
-      console.log("Login success:", response.data);
-      alert("Login successful!");
-      // setIsLoggedIn(true);
 
-      // navigate("/"); // go to home page
+        navigate("/"); // default redirect
+      }
+
+      alert("Login successful!");
     } catch (error) {
       console.log("Login error:", error);
       alert("Invalid email or password");
