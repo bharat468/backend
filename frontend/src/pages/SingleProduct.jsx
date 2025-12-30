@@ -13,11 +13,17 @@ const SingleProduct = () => {
   const [message, setMessage] = useState({
     state: "",
     text: "",
-  })
+  });
+
+  // 🌍 backend URL auto-switch (local + deploy)
+  const backendURL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:3000"
+      : "https://backend-b7x0.onrender.com";
 
   async function getSingleData() {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await instance.get("/product/" + slug);
       setProduct(response.data[0]); // API returns array
       setLoading(false);
@@ -40,7 +46,7 @@ const SingleProduct = () => {
         { productId: productId, quantity: 1 },
         { withCredentials: true }
       );
-      navigate("/cart")
+      navigate("/cart");
       if (response.status === 201) {
         setMessage({
           state: "success",
@@ -60,10 +66,10 @@ const SingleProduct = () => {
           {message.text}
         </h2>
       )}
+
       <div className="single-product-image">
         <img
-          src={`http://localhost:3000/${product.image}`}
-          // src={product.image}
+          src={`${backendURL}/${product.image}`}  // ⭐ FIXED HERE
           alt={product.name}
         />
       </div>
