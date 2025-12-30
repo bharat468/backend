@@ -2,12 +2,17 @@ import { PiCurrencyInrLight } from "react-icons/pi";
 import { Link } from "react-router-dom";
 
 function ProductCard({ product, slug }) {
+  // 💡 backend URL auto switch (local & deploy)
+  const backendURL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:3000"
+      : "https://backend-b7x0.onrender.com";
+
   return (
     <div className="productCard">
-      {/* <img src={product.image} alt={product.name} /> */}
       <Link to={`/product/${slug}`}>
         <img
-          src={`http://localhost:3000/${product.image}`}
+          src={`${backendURL}/${product.image}`} // 🧠 auto image base URL
           alt={product.name}
         />
       </Link>
@@ -24,11 +29,9 @@ function ProductCard({ product, slug }) {
               <strong>{product.discountedPrice}</strong>
             </>
           ) : (
-            
             <strong>{product.originalPrice}</strong>
           )}
         </p>
-        {/* <button>Add To Cart</button> */}
       </div>
     </div>
   );
