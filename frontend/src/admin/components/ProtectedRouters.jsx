@@ -1,7 +1,8 @@
-import axios from "axios";
+// import axios from "axios";
 import React, { useEffect } from "react";
+import instance from "../../axiosConfig";
 
-function  ProtectedRouters({ children }) {
+function ProtectedRouters({ children }) {
 
     useEffect(() => {
         checkForlogin()
@@ -9,8 +10,8 @@ function  ProtectedRouters({ children }) {
 
 
     async function checkForlogin() {
-        const response = await axios.get(
-            "http://localhost:3000/check/login?referer=admin",
+        const response = await instance.get(
+            "/check/login?referer=admin",
             { withCredentials: true })
 
         console.log(response)

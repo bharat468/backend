@@ -2,10 +2,7 @@ import axios from "axios";
 
 
 
-const baseURL =
-  window.location.hostname === "localhost"
-    ? "http://localhost:3000"           // development URL
-    : "https://backend-b7x0.onrender.com"; // production URL
+const baseURL = import.meta.env.VITE_BASEURL;
 
 const instance = axios.create({
   baseURL,

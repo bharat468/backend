@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
+import instance from "../../axiosConfig";
 
 function AddProduct() {
     const [data, setData] = useState({
@@ -36,15 +37,15 @@ function AddProduct() {
     }
 
     async function checkSlug(e) {
+        try {
+            const res = await instance.get("/product/checkslug/" + e.target.value);
 
-        const res = await axios.get(
-            "http://localhost:300/product/checkslug/" + e.target.value
-        )
-
-        if (res.status === 400) {
-            alert("bhai 2 bar nahi hoga")
+            if (res.status === 400) {
+                alert("bhai 2 bar nahi hoga");
+            }
+        } catch (error) {
+            console.log(error);
         }
-
     }
 
     async function handleSubmit(e) {
@@ -57,8 +58,8 @@ function AddProduct() {
         });
 
         try {
-            const response = await axios.post(
-                "http://localhost:3000/product",
+            const response = await instance.post(
+                "/product",
                 product,
                 { withCredentials: true }
             );
