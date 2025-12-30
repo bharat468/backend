@@ -3,7 +3,7 @@ import connectToDB from "./db/connect.js";
 import productRouter from "./routes/productRouter.js";
 import authRouter from "./routes/Auth.js";
 import cors from "cors";
-import adminRouter from "./routes/Admin.js";
+import adminRouter from "./routes/admin.js";
 // import router from "./routes/router.js";
 import checkRouter from "./routes/Check.js";
 import cartRouter from "./routes/cart.js";
