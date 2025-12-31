@@ -82,7 +82,7 @@ export async function loginUser(req, res) {
    res.cookie("auth_token", auth_token, {
      httpOnly: true,
      secure: true, 
-     sameSite: "None", 
+     sameSite: "none", 
      maxAge: 3600 * 1000, 
    });
 
@@ -99,7 +99,7 @@ export async function logoutUser(req, res) {
     res.cookie("auth_token", "", {
       httpOnly: true,
       secure: true,
-      sameSite: "None",
+      sameSite: "none",
       maxAge: -1,
     });
     return res.status(200).json({ message: "User logged out successfully" });

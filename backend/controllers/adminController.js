@@ -27,8 +27,8 @@ export async function loginAdmin(req, res) {
 
         res.cookie("admin_token", admin_token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "None",
+            secure: false,
+            sameSite: "lax",
             maxAge: 3600000
         });
 
@@ -44,7 +44,7 @@ export async function logoutAdmin(req, res) {
         res.clearCookie("admin_token", {
             httpOnly: true,
             secure: true,
-            sameSite: "None",
+            sameSite: "none",
             maxAge: -1
         });
 
