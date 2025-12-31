@@ -7,7 +7,7 @@ export async function checkAuth(req, res, next) {
         if (!token)
             return res.status(401).json({ message: "you need to log in to perform this action" });
 
-        const decoded = jwt.verify(token, process.env.JWT_secret);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.id;
         next();
 
@@ -35,7 +35,7 @@ export async function checkForlogin(req, res) {
             return res.status(401).json({ message: "no authentication token, accesss denied" })
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_secret)
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
         if (decoded.role === req.query.referer)
             return res.status(200).json({ message: "token verified" })
     }
