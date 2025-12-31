@@ -11,6 +11,7 @@ const Cart = () => {
   async function getCart() {
     try {
       const res = await instance.get("/cart", { withCredentials: true });
+      console.log(res.data)
       setCart(res.data);
     } catch (error) {
       console.log(error);
@@ -45,7 +46,9 @@ const Cart = () => {
 
   const totalAmount = cart.reduce(
     (sum, item) =>
-      sum + item.productId.discountedPrice * item.quantity,
+      sum +
+      (item.productId.discountedPrice || item.productId.originalPrice) *
+        item.quantity,
     0
   );
 
@@ -67,22 +70,18 @@ const Cart = () => {
 
                 <div className="cart-details">
                   <h3>{item.productId.name}</h3>
-                  <p>₹ {item.productId.discountedPrice}</p>
+                  <p>
+                    ₹{" "}
+                    {item.productId.discountedPrice ||
+                      item.productId.originalPrice}
+                  </p>
 
                   <div className="qty-box">
-                    <button
-                      onClick={() =>
-                        updateQty(item._id, item.quantity - 1)
-                      }
-                    >
+                    <button onClick={() => updateQty(item._id, item.quantity - 1)}>
                       -
                     </button>
                     <span>{item.quantity}</span>
-                    <button
-                      onClick={() =>
-                        updateQty(item._id, item.quantity + 1)
-                      }
-                    >
+                    <button onClick={() => updateQty(item._id, item.quantity + 1)}>
                       +
                     </button>
                   </div>

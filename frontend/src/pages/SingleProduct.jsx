@@ -7,19 +7,21 @@ import { useAuth } from "../contexts/AuthProvider";
 const SingleProduct = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { isLoggedIn } = useAuth();
-  const [message, setMessage] = useState({
-    state: "",
-    text: "",
-  });
+  const [alreadyInCart, setAlreadyInCart] = useState(false);
+  const [btnLoading, setBtnLoading] = useState(false);
 
+  // --------------------------
+  // 1️⃣ Product details fetch
+  // --------------------------
   async function getSingleData() {
     try {
       setLoading(true);
       const response = await instance.get("/product/" + slug);
-      setProduct(response.data[0]); // API returns array
+      setProduct(response.data[0]);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -27,43 +29,67 @@ const SingleProduct = () => {
     }
   }
 
+  // --------------------------
+  // 2️⃣ Check if in cart
+  // --------------------------
+  async function checkCart(prodId) {
+    try {
+      const res = await instance.get("/cart", { withCredentials: true });
+      const found = res.data.find((item) => item.productId._id === prodId);
+      if (found) setAlreadyInCart(true);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // --------------------------
+  // 3️⃣ Add to cart on button click
+  // --------------------------
+  async function handleAddToCart() {
+    if (!isLoggedIn) {
+      navigate(`/login?nextPage=/product/${slug}`);
+      return;
+    }
+
+    try {
+      setBtnLoading(true);
+      await instance.post(
+        "/cart/add",
+        { productId: product._id, quantity: 1 },
+        { withCredentials: true }
+      );
+      setAlreadyInCart(true);  // UI update
+      setBtnLoading(false);
+    } catch (error) {
+      console.log(error);
+      setBtnLoading(false);
+    }
+  }
+
+  // --------------------------
+  // On page load
+  // --------------------------
   useEffect(() => {
     getSingleData();
   }, [slug]);
 
-  async function handleAddToCart(productId) {
-    if (!isLoggedIn) {
-      navigate("/login?nextPage=/product/" + slug);
-    } else {
-      const response = await instance.post(
-        "/cart/add",
-        { productId: productId, quantity: 1 },
-        { withCredentials: true }
-      );
-      navigate("/cart");
-      if (response.status === 201) {
-        setMessage({
-          state: "success",
-          text: "Product Added to Cart",
-        });
-      }
+  // --------------------------
+  // After product arrives → check cart
+  // --------------------------
+  useEffect(() => {
+    if (product && isLoggedIn) {
+      checkCart(product._id);
     }
-  }
+  }, [product, isLoggedIn]);
 
   if (loading) return <p>Loading...</p>;
   if (!product) return <p>Product not found</p>;
 
   return (
     <div className="single-product">
-      {message.state.length > 0 && (
-        <h2 className={`${message.state === "success" ? "success" : "error"}`}>
-          {message.text}
-        </h2>
-      )}
-
       <div className="single-product-image">
         <img
-          src={`${instance.defaults.baseURL}/${product.image}`}  // ⭐ HERE
+          src={`${instance.defaults.baseURL}/${product.image}`}
           alt={product.name}
         />
       </div>
@@ -86,11 +112,17 @@ const SingleProduct = () => {
 
         <p className="description">{product.description}</p>
 
+        {/* ---------- BUTTON ---------- */}
         <button
           className="add-to-cart"
-          onClick={() => handleAddToCart(product._id)}
+          onClick={handleAddToCart}
+          disabled={alreadyInCart || btnLoading}
         >
-          Add to Cart
+          {btnLoading
+            ? "Adding..."
+            : alreadyInCart
+            ? "Already in Cart"
+            : "Add to Cart"}
         </button>
       </div>
     </div>
