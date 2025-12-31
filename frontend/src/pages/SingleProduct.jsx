@@ -3,11 +3,13 @@ import instance from "../axiosConfig";
 import { useNavigate, useParams } from "react-router-dom";
 import { PiCurrencyInrLight } from "react-icons/pi";
 import { useAuth } from "../contexts/AuthProvider";
+import { useCart } from "../contexts/CartContext"; // <-- ADD THIS
 
 const SingleProduct = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const { fetchCartCount } = useCart(); // <-- CART COUNT UPDATE
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,8 +60,11 @@ const SingleProduct = () => {
         { productId: product._id, quantity: 1 },
         { withCredentials: true }
       );
-      setAlreadyInCart(true);  // UI update
+
+      setAlreadyInCart(true); // UI update
+      fetchCartCount();       // <-- UPDATE HEADER COUNT
       setBtnLoading(false);
+
     } catch (error) {
       console.log(error);
       setBtnLoading(false);

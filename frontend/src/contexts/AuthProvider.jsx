@@ -5,24 +5,29 @@ const authContext = createContext();
 
 function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loggedinUser, setLoggedinUser] = useState(null);
 
   useEffect(() => {
     checkIsLoggedIn();
   }, []);
 
   async function checkIsLoggedIn() {
-    const response = await instance.get("/check/login?referer=user", {
-      withCredentials: true,
-    });
-    console.log(response);
-    if (response.status === 200) setIsLoggedIn(true);
+    try {
+      const response = await instance.get("/check/login?referer=user", {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch {
+      setIsLoggedIn(false);
+    }
   }
 
   return (
-    <authContext.Provider
-      value={{ isLoggedIn, loggedinUser, checkIsLoggedIn, setIsLoggedIn }}
-    >
+    <authContext.Provider value={{ isLoggedIn, checkIsLoggedIn, setIsLoggedIn }}>
       {children}
     </authContext.Provider>
   );

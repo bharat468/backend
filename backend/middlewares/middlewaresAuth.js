@@ -36,8 +36,10 @@ export async function checkForlogin(req, res) {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        if (decoded.role === req.query.referer)
+        if (decoded.role === req.query.referer) {
+            console.log("object");
             return res.status(200).json({ message: "token verified" })
+        }
     }
 
     catch (error) {

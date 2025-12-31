@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import First from "./pages/First";
 import AdminLogin from "./admin/pages/AdminLogin";
 import Home from "./pages/Home";
@@ -9,59 +9,51 @@ import AddProduct from "./admin/pages/AddProduct";
 import ProtectedRouters from "./admin/components/ProtectedRouters";
 import SingleProduct from "./pages/SingleProduct";
 import Cart from "./pages/Cart";
-// import ProductCard from "./components/ProductCard";
-// import Product from "./pages/Product";
+import AdminHome from "./admin/pages/AdminHome";
+import AdminCreateCoupon from "./admin/pages/AdminCreateCoupon";
+import { CartProvider } from "./contexts/CartContext";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <First />,
     children: [
-      {
-        index: true,
-        element: <Home />,
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+
+      // ❗ FIX: remove slash here
+      { path: "product/:slug", element: <SingleProduct /> },
+      { path: "cart", element: <Cart /> },
+
+      // ================= ADMIN AREA =================
+      { path: "admin", element: <Navigate to="admin/login" replace /> }, // nested redirect
+
+      { path: "admin/login", element: <AdminLogin /> },
+
+      { 
+        path: "admin/home",
+        element: (
+          <ProtectedRouters>
+            <AdminHome />
+          </ProtectedRouters>
+        ),
       },
+
       {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "register",
-        element: <Register />,
-      },
-      {
-        path: "/admin/login",
-        element: <AdminLogin />,
-      },
-      {
-        path: "/admin/home",
-        element: <AdminLogin />,
-      },
-      {
-        path: "/logout",
-        element: <Login />,
-      },
-      {
-        path: "/product/:slug",
-        element: <SingleProduct/>,
-      },
-      {
-        path: "/cart",
-        element: <Cart />
-      },
-      // {
-      //   path: "/product",
-      //   element: <Product />,
-      // },
-      // {
-      //   path: "/productCard",
-      //   element: <ProductCard />,
-      // },
-      {
-        path: "/admin/product/add",
+        path: "admin/product/add",
         element: (
           <ProtectedRouters>
             <AddProduct />
+          </ProtectedRouters>
+        ),
+      },
+
+      {
+        path: "admin/coupon/create",
+        element: (
+          <ProtectedRouters>
+            <AdminCreateCoupon />
           </ProtectedRouters>
         ),
       },
@@ -72,7 +64,9 @@ const router = createBrowserRouter([
 function App() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <CartProvider>
+        <RouterProvider router={router} />
+      </CartProvider>
     </AuthProvider>
   );
 }

@@ -8,7 +8,7 @@ export async function loginAdmin(req, res) {
     try {
         const data = req.body;
 
-        console.log(data);
+        console.log("Admin Login Data:", data);
 
         const user = await Auth.findOne({ email: data.email });
         if (!user) return res.status(404).json({ message: "Email not found" });
@@ -17,7 +17,8 @@ export async function loginAdmin(req, res) {
             return res.status(401).json({ message: "You are not an Admin" });
 
         const doesPasswordMatch = await bcrypt.compare(data.password, user.password);
-        if (!doesPasswordMatch) return res.status(404).json({ message: "Invalid Credentials" });
+        if (!doesPasswordMatch)
+            return res.status(404).json({ message: "Invalid Credentials" });
 
         const admin_token = jwt.sign(
             { id: user._id, role: user.role },
@@ -25,10 +26,11 @@ export async function loginAdmin(req, res) {
             { expiresIn: "1h" }
         );
 
+        // 🔹 FIXED COOKIE SETTINGS (sameSite + secure)
         res.cookie("admin_token", admin_token, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: true,       // <= IMPORTANT
+            sameSite: "none",   // <= IMPORTANT (for cross-site cookies)
             maxAge: 3600000
         });
 

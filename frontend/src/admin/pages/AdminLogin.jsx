@@ -1,72 +1,39 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Link } from "react-router-dom";
-import instance from "../../axiosConfig";  
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import instance from "../../axiosConfig";
+import "../admin.css";
 
 function AdminLogin() {
+  const navigate = useNavigate();
+  const [data, setData] = useState({ email: "", password: "" });
 
-    const navigate = useNavigate()
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
+  }
 
-    const [data, setData] = useState({
-        email: "",
-        password: ""
-    })
-
-    function handleChange(e) {
-        const { name, value } = e.target
-        setData({ ...data, [name]: value })
+  async function handleSubmit(e) {
+    e.preventDefault();
+    try {
+      await instance.post("/admin/login", data, { withCredentials: true });
+      navigate("/admin/home");
+    } catch {
+      alert("Invalid credentials");
     }
+  }
 
-    async function handleSubmit(e) {
-        e.preventDefault()
+  return (
+    <div className="admin-wrapper">
+      <h2 className="admin-title">Admin Login</h2>
 
-        try {
-            // ⭐ localhost हट गया → instance से auto URL switch
-            const response = await instance.post("/admin/login", data)
-
-            console.log("Login success", response.data)
-            alert("Admin logged in successfully")
-
-            navigate("/admin/product/add")
-        }
-        catch (error) {
-            console.log("login error", error)
-            alert("Invalid email or password")
-        }
-    }
-
-    return (
-        <div>
-            <h2>Admin Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div className='form-group'>
-                    <label>Email</label>
-                    <input 
-                        type="text"
-                        placeholder='Enter Your Email'
-                        name='email'
-                        value={data.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <div className='form-group'>
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        placeholder='Enter Your Password'
-                        name='password'
-                        value={data.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                <button type='submit'>Login</button>
-            </form>
-        </div>
-    )
+      <form className="admin-form" onSubmit={handleSubmit}>
+        <input className="admin-input" name="email" value={data.email} onChange={handleChange} placeholder="Email" required />
+        <input className="admin-input" type="password" name="password" value={data.password} onChange={handleChange} placeholder="Password" required />
+        <button className="admin-btn" type="submit">Login</button>
+      </form>
+    </div>
+  );
 }
 
-export default AdminLogin
+export default AdminLogin;
+        
