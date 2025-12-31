@@ -71,7 +71,7 @@ body {
     font-size: 32px;
     font-weight: 800;
     color: white;
-    text-decoration: none;
+    text-decoration: None;
     letter-spacing: .6px;
     transition: .3s;
     margin-right: 40px;
@@ -104,8 +104,8 @@ body {
 .search-box input {
     width: 100%;
     padding: 13px;
-    border: none;
-    outline: none;
+    border: None;
+    outline: None;
     font-size: 15px;
     color: var(--textDark);
 }
@@ -113,7 +113,7 @@ body {
 .search-box button {
     width: 60px;
     background: var(--mainColor);
-    border: none;
+    border: None;
     color: white;
     cursor: pointer;
     font-size: 19px;
@@ -134,7 +134,7 @@ body {
 }
 
 .icon {
-    text-decoration: none;
+    text-decoration: None;
     color: white;
     font-size: 17px;
     display: flex;
@@ -286,7 +286,7 @@ form:hover {
 .form-group input[type="file"]::-webkit-file-upload-button {
     background: var(--mainColor);
     color: white;
-    border: none;
+    border: None;
     padding: 8px 17px;
     border-radius: 6px;
     cursor: pointer;
@@ -304,7 +304,7 @@ button[type="submit"] {
     width: 100%;
     padding: 14px;
     background: var(--mainGrad);
-    border: none;
+    border: None;
     color: white;
     border-radius: 10px;
     font-size: 17px;
@@ -354,7 +354,7 @@ button:active {
 }
 
 .footer-links a {
-    text-decoration: none;
+    text-decoration: None;
     color: white;
     font-size: 15px;
     font-weight: 600;
@@ -456,7 +456,7 @@ body {
     font-size: 34px;
     font-weight: 800;
     color: white;
-    text-decoration: none;
+    text-decoration: None;
     letter-spacing: .5px;
     transition: 0.2s;
 }
@@ -487,16 +487,16 @@ body {
 .search-box input {
     flex: 1;
     padding: 0 18px;
-    border: none;
+    border: None;
     font-size: 15px;
-    outline: none;
+    outline: None;
     color: #444;
 }
 
 .search-box button {
     width: 60px;
     background: var(--mainColor);
-    border: none;
+    border: None;
     color: white;
     font-size: 20px;
     cursor: pointer;
@@ -524,7 +524,7 @@ body {
     align-items: center;
     gap: 7px;
     color: white;
-    text-decoration: none;
+    text-decoration: None;
     font-size: 16px;
     transition: .25s ease;
 }
@@ -594,7 +594,7 @@ button[type="submit"] {
     padding: 14px;
     background: var(--mainGrad);
     color: white;
-    border: none;
+    border: None;
     border-radius: 10px;
     font-size: 17px;
     font-weight: 600;
@@ -672,7 +672,7 @@ button[type="submit"]:hover {
 }
 
 .productCard a {
-    text-decoration: none;
+    text-decoration: None;
     color: inherit;
 }
 
@@ -792,7 +792,7 @@ button[type="submit"]:hover {
     padding: 14px 30px;
     background: var(--mainGrad);
     color: white;
-    border: none;
+    border: None;
     border-radius: 10px;
     font-size: 17px;
     font-weight: 600;
@@ -816,8 +816,8 @@ button[type="submit"]:hover {
     }
 }
 .logout-btn {
-  background: none;
-  border: none;
+  background: None;
+  border: None;
   cursor: pointer;
   color: inherit;
   display: flex;
@@ -877,7 +877,7 @@ button[type="submit"]:hover {
 .remove-btn {
   background: crimson;
   color: white;
-  border: none;
+  border: None;
   padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
@@ -893,7 +893,7 @@ button[type="submit"]:hover {
   padding: 12px 20px;
   background: #0e5c63;
   color: white;
-  border: none;
+  border: None;
   font-size: 16px;
   border-radius: 6px;
   cursor: pointer;
@@ -918,7 +918,7 @@ button[type="submit"]:hover {
 .cart-toast button {
   background: white;
   color: #0e5c63;
-  border: none;
+  border: None;
   padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
