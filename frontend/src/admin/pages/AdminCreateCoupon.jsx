@@ -19,10 +19,26 @@ const AdminCreateCoupon = () => {
     <div className="admin-wrapper">
       <h2 className="admin-title">Create Coupon</h2>
 
-      <form className="admin-form" onSubmit={handleSubmit}>
-        <input className="admin-input" name="code" placeholder="NEW10" onChange={handleChange}/>
-        <input className="admin-input" name="discountPercent" type="number" placeholder="10" onChange={handleChange}/>
-        <input className="admin-input" name="expiresAt" type="date" onChange={handleChange}/>
+      <form className="admin-form"
+        onSubmit={handleSubmit}>
+
+        <input className="admin-input"
+          name="code"
+          placeholder="NEW10"
+          onChange={handleChange} />
+
+        <input className="admin-input"
+          name="discountPercent"
+          type="number"
+          placeholder="10"
+          onChange={handleChange} />
+
+        <input className="admin-input"
+          name="expiresAt"
+          type="date"
+          onChange={handleChange} />
+
+
         <button className="admin-btn">Create Coupon</button>
       </form>
     </div>

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaShoppingCart, FaUser, FaSearch } from "react-icons/fa";
+import { FaShoppingCart, FaUser, FaBars } from "react-icons/fa";
 import { IoMdLogOut } from "react-icons/io";
 import instance from "../axiosConfig";
 import { useCart } from "../contexts/CartContext";
@@ -10,33 +10,46 @@ function Header() {
   const navigate = useNavigate();
   const { cartCount } = useCart();
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
   async function logout() {
     await instance.post("/user/logout");
     navigate("/login");
+    setMenuOpen(false);
   }
 
   return (
     <header className="header">
+
       <div className="logo">
-        <Link to="/"> Ecommerce</Link>
+        <Link to="/" onClick={() => setMenuOpen(false)}>Ecommerce</Link>
       </div>
 
-      {/* <div className="search-box">
-        <input type="text" placeholder="Search for products..." />
-        <button><FaSearch /></button>
-      </div> */}
+      {/* MENU ICON MOBILE */}
+      <div className="menu-icon" onClick={() => setMenuOpen(!menuOpen)}>
+        <FaBars />
+      </div>
 
-      <div className="icons">
+      {/* NAV LINKS */}
+      <div className={`icons ${menuOpen ? "open" : ""}`}>
 
-        <Link to="/login" className="icon"><FaUser /> <span>Login</span></Link>
-        <Link to="/register" className="icon"><FaUser /> <span>Register</span></Link>
+        <Link to="/login" className="icon" onClick={() => setMenuOpen(false)}>
+          <FaUser /> <span>Login</span>
+        </Link>
 
-        <span className="icon" onClick={logout}><IoMdLogOut /> <span>Logout</span></span>
+        <Link to="/register" className="icon" onClick={() => setMenuOpen(false)}>
+          <FaUser /> <span>Register</span>
+        </Link>
 
-        <Link to="/cart" className="icon cart-icon">
+        <span className="icon" onClick={logout}>
+          <IoMdLogOut /> <span>Logout</span>
+        </span>
+
+        <Link to="/cart" className="icon cart-icon" onClick={() => setMenuOpen(false)}>
           <FaShoppingCart /> <span>Cart</span>
           {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
         </Link>
+
       </div>
     </header>
   );
