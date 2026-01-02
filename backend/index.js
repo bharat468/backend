@@ -34,4 +34,5 @@ app.use("/uploads", express.static("uploads"));
 app.use("/cart", cartRouter);
 app.use("/coupon", couponRoutes);
 
+
 app.listen(3000, () => console.log("Server started at port 3000"));

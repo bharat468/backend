@@ -66,7 +66,7 @@ export async function loginUser(req, res) {
     );
     if (user.role !== "user")
       return res.status(404).json({ message: "you are not a user" });
-    
+
     if (!doesPasswordMatch) {
       return res.status(404).json({ message: "Invalid Credentials" });
     }
@@ -79,12 +79,12 @@ export async function loginUser(req, res) {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-   res.cookie("auth_token", auth_token, {
-     httpOnly: true,
-     secure: true, 
-     sameSite: "none", 
-     maxAge: 3600 * 1000, 
-   });
+    res.cookie("auth_token", auth_token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 3600 * 1000,
+    });
 
 
     return res.status(200).json({ message: "Login Successful", user: user });
@@ -96,17 +96,18 @@ export async function loginUser(req, res) {
 }
 export async function logoutUser(req, res) {
   try {
-    res.cookie("auth_token", "", {
+    res.clearCookie("auth_token", {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: -1,
+      secure: false,   // 🔥 SAME AS LOGIN
+      sameSite: "lax", // 🔥 SAME AS LOGIN
     });
+
     return res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 }
+
 export async function updateUser(req, res) {
   try {
     const { id } = req.params;

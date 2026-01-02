@@ -3,51 +3,47 @@ import instance from "../axiosConfig";
 import { useNavigate, useParams } from "react-router-dom";
 import { PiCurrencyInrLight } from "react-icons/pi";
 import { useAuth } from "../contexts/AuthProvider";
-import { useCart } from "../contexts/CartContext"; // <-- ADD THIS
+import { useCart } from "../contexts/CartContext";
+import { toast } from "react-toastify";
 
 const SingleProduct = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
-  const { fetchCartCount } = useCart(); // <-- CART COUNT UPDATE
+  const { fetchCartCount } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [alreadyInCart, setAlreadyInCart] = useState(false);
   const [btnLoading, setBtnLoading] = useState(false);
 
-  // --------------------------
-  // 1️⃣ Product details fetch
-  // --------------------------
+  // 🔹 Fetch product
   async function getSingleData() {
     try {
       setLoading(true);
-      const response = await instance.get("/product/" + slug);
-      setProduct(response.data[0]);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
+      const res = await instance.get("/product/" + slug);
+      setProduct(res.data[0]);
+    } catch {
+      toast.error("Failed to load product");
+    } finally {
       setLoading(false);
     }
   }
 
-  // --------------------------
-  // 2️⃣ Check if in cart
-  // --------------------------
+  // 🔹 Check cart
   async function checkCart(prodId) {
     try {
       const res = await instance.get("/cart", { withCredentials: true });
-      const found = res.data.find((item) => item.productId._id === prodId);
+      const found = res.data.find(
+        (item) => item.productId._id === prodId
+      );
       if (found) setAlreadyInCart(true);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch {}
   }
 
-  // --------------------------
-  // 3️⃣ Add to cart on button click
-  // --------------------------
+  // 🔹 Add to cart
   async function handleAddToCart() {
+    // ❌ Not logged in → send to login with nextPage
     if (!isLoggedIn) {
       navigate(`/login?nextPage=/product/${slug}`);
       return;
@@ -61,74 +57,96 @@ const SingleProduct = () => {
         { withCredentials: true }
       );
 
-      setAlreadyInCart(true); // UI update
-      fetchCartCount();       // <-- UPDATE HEADER COUNT
-      setBtnLoading(false);
-
-    } catch (error) {
-      console.log(error);
+      setAlreadyInCart(true);
+      fetchCartCount();
+      toast.success("Product added to cart");
+      navigate("/cart");
+    } catch {
+      toast.error("Failed to add product");
+    } finally {
       setBtnLoading(false);
     }
   }
 
-  // --------------------------
-  // On page load
-  // --------------------------
   useEffect(() => {
     getSingleData();
   }, [slug]);
 
-  // --------------------------
-  // After product arrives → check cart
-  // --------------------------
   useEffect(() => {
     if (product && isLoggedIn) {
       checkCart(product._id);
     }
   }, [product, isLoggedIn]);
 
-  if (loading) return <p>Loading...</p>;
-  if (!product) return <p>Product not found</p>;
+  if (loading) {
+    return <p className="text-center py-20">Loading...</p>;
+  }
+
+  if (!product) {
+    return <p className="text-center py-20">Product not found</p>;
+  }
 
   return (
-    <div className="single-product">
-      <div className="single-product-image">
-        <img
-          src={`${instance.defaults.baseURL}/${product.image}`}
-          alt={product.name}
-        />
-      </div>
+    <div className="bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 gap-12">
 
-      <div className="single-product-details">
-        <h1>{product.name}</h1>
-        <p className="category">{product.category}</p>
+        {/* IMAGE */}
+        <div className="bg-white rounded-2xl shadow p-6 flex items-center justify-center">
+          <img
+            src={`${instance.defaults.baseURL}/${product.image}`}
+            alt={product.name}
+            className="max-h-96 object-contain"
+          />
+        </div>
 
-        <p className="price">
-          <PiCurrencyInrLight />
-          {product.discountedPrice ? (
-            <>
-              <del>{product.originalPrice}</del>{" "}
-              <strong>{product.discountedPrice}</strong>
-            </>
-          ) : (
-            <strong>{product.originalPrice}</strong>
-          )}
-        </p>
+        {/* DETAILS */}
+        <div className="space-y-4">
+          <h1 className="text-3xl font-bold">{product.name}</h1>
 
-        <p className="description">{product.description}</p>
+          <p className="text-slate-500 text-sm uppercase">
+            {product.category}
+          </p>
 
-        {/* ---------- BUTTON ---------- */}
-        <button
-          className="add-to-cart"
-          onClick={handleAddToCart}
-          disabled={alreadyInCart || btnLoading}
-        >
-          {btnLoading
-            ? "Adding..."
-            : alreadyInCart
-            ? "Already in Cart"
-            : "Add to Cart"}
-        </button>
+          <div className="flex items-center gap-3 text-xl">
+            <PiCurrencyInrLight />
+            {product.discountedPrice ? (
+              <>
+                <del className="text-slate-400">
+                  {product.originalPrice}
+                </del>
+                <span className="text-teal-600 font-bold">
+                  {product.discountedPrice}
+                </span>
+              </>
+            ) : (
+              <span className="font-bold">
+                {product.originalPrice}
+              </span>
+            )}
+          </div>
+
+          <p className="text-slate-600">
+            {product.description}
+          </p>
+
+          <button
+            onClick={handleAddToCart}
+            disabled={alreadyInCart || btnLoading}
+            className={`mt-4 px-6 py-3 rounded-lg font-semibold
+              ${
+                alreadyInCart
+                  ? "bg-slate-300 cursor-not-allowed"
+                  : "bg-teal-600 hover:bg-teal-700 text-white"
+              }
+            `}
+          >
+            {btnLoading
+              ? "Adding..."
+              : alreadyInCart
+              ? "Already in Cart"
+              : "Add to Cart"}
+          </button>
+        </div>
       </div>
     </div>
   );

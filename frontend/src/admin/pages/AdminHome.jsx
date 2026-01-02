@@ -1,21 +1,28 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../admin.css";
 
 function AdminHome() {
   return (
     <>
-      <div className="admin-nav">
-        <span>Admin Panel</span>
-        <Link to="/">Main Website</Link>
-      </div>
+      <header className="admin-header">
+        <h1>Dashboard</h1>
+      </header>
 
-      <div className="admin-wrapper">
+      <div className="admin-cards">
         <div className="admin-card">
-          <h2 className="admin-title">Quick Actions</h2>
+          <h3>Add Product</h3>
+          <p>Create new product</p>
+          <Link to="/admin/product/add">
+            <button>Add Now</button>
+          </Link>
+        </div>
 
-          <Link to="/admin/product/add"><button className="admin-btn">Add Product</button></Link>
-          <Link to="/admin/coupon/create"><button className="admin-btn admin-btn-secondary">Create Coupon</button></Link>
+        <div className="admin-card">
+          <h3>Create Coupon</h3>
+          <p>Generate discount coupons</p>
+          <Link to="/admin/coupon/create">
+            <button className="secondary">Create</button>
+          </Link>
         </div>
       </div>
     </>

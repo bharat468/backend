@@ -1,32 +1,49 @@
 import { PiCurrencyInrLight } from "react-icons/pi";
 import { Link } from "react-router-dom";
-import instance from "../axiosConfig"; // 🌍 import instance
+import instance from "../axiosConfig";
 
 function ProductCard({ product, slug }) {
   return (
-    <div className="productCard">
-      <Link to={`/product/${slug}`}>
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group">
+
+      {/* IMAGE */}
+      <Link to={`/product/${slug}`} className="block overflow-hidden">
         <img
-          src={`${instance.defaults.baseURL}/${product.image}`} // ⭐ instance BASE URL
+          src={`${instance.defaults.baseURL}/${product.image}`}
           alt={product.name}
+          className="w-full h-56 object-contain group-hover:scale-105 transition-transform duration-300"
         />
       </Link>
 
-      <div className="content">
+      {/* CONTENT */}
+      <div className="p-4 space-y-2">
+
+        {/* PRODUCT NAME */}
         <Link to={`/product/${slug}`}>
-          <h3>{product.name}</h3>
+          <h3 className="text-lg font-semibold text-slate-800 line-clamp-1 hover:text-teal-600 transition">
+            {product.name}
+          </h3>
         </Link>
-        <p>
-          <PiCurrencyInrLight />
+
+        {/* PRICE */}
+        <div className="flex items-center gap-2 text-slate-700">
+          <PiCurrencyInrLight className="text-xl" />
+
           {product.discountedPrice ? (
-            <>
-              <del>{product.originalPrice}</del>
-              <strong>{product.discountedPrice}</strong>
-            </>
+            <div className="flex items-center gap-2">
+              <del className="text-slate-400 text-sm">
+                {product.originalPrice}
+              </del>
+              <span className="text-lg font-bold text-teal-600">
+                {product.discountedPrice}
+              </span>
+            </div>
           ) : (
-            <strong>{product.originalPrice}</strong>
+            <span className="text-lg font-bold text-slate-800">
+              {product.originalPrice}
+            </span>
           )}
-        </p>
+        </div>
       </div>
     </div>
   );
