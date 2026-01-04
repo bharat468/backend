@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import instance from "../../axiosConfig";
 import { toast } from "react-toastify";
-import { FaEye, FaEyeSlash, FaSpinner } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaShoppingBag } from "react-icons/fa";
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -39,7 +39,6 @@ function AdminLogin() {
 
       toast.success("Admin login successful 🔐");
       navigate("/admin/home");
-
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Invalid admin credentials ❌"
@@ -76,7 +75,7 @@ function AdminLogin() {
               name="email"
               value={data.email}
               onChange={handleChange}
-              placeholder="admin@example.com"
+              placeholder="Enter email"
               className="w-full px-4 py-3 rounded-lg border border-slate-300
               bg-slate-100 focus:outline-none focus:ring-2
               focus:ring-slate-800"
@@ -121,11 +120,16 @@ function AdminLogin() {
             disabled={loading}
             className={`w-full py-3 rounded-lg text-white text-lg font-semibold
               bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
-              transition shadow-md flex items-center justify-center gap-2
+              transition shadow-md flex items-center justify-center gap-3
               ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}
             `}
           >
-            {loading && <FaSpinner className="animate-spin" />}
+            {loading && (
+              <div className="relative">
+                <FaShoppingBag className="text-xl text-teal-300 animate-bounce" />
+                <div className="absolute -inset-2 border border-dashed border-teal-300 rounded-full animate-spin"></div>
+              </div>
+            )}
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>

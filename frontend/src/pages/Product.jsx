@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import instance from "../axiosConfig";
+import { FaShoppingBag } from "react-icons/fa";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
@@ -24,7 +25,6 @@ const Product = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-
       <div className="max-w-7xl mx-auto px-6 py-10">
 
         {/* PAGE HEADING */}
@@ -37,19 +37,17 @@ const Product = () => {
           </p>
         </div>
 
-        {/* LOADING STATE */}
+        {/* 🔥 ATTRACTIVE LOADER */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl shadow p-4 animate-pulse"
-              >
-                <div className="h-56 bg-slate-200 rounded-lg mb-4"></div>
-                <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-slate-200 rounded w-1/2"></div>
-              </div>
-            ))}
+          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+            <div className="relative">
+              <FaShoppingBag className="text-6xl text-teal-600 animate-bounce" />
+              <div className="absolute -inset-4 border-2 border-dashed border-teal-400 rounded-full animate-spin"></div>
+            </div>
+
+            <p className="text-slate-500 text-sm tracking-wide">
+              Loading amazing products...
+            </p>
           </div>
         ) : (
           /* PRODUCTS GRID */

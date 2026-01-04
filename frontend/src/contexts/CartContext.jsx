@@ -8,10 +8,18 @@ export function CartProvider({ children }) {
 
   async function fetchCartCount() {
     try {
-      const res = await instance.get("/cart", { withCredentials: true });
-      setCartCount(res.data.length);
+      const res = await instance.get("/cart", {
+        withCredentials: true,
+      });
+
+      // ✅ same clean logic as Cart page
+      const cleanCart = res.data.filter(item => item.productId);
+
+      // ✅ ONLY product length (NOT quantity)
+      setCartCount(cleanCart.length);
     } catch (err) {
       console.log(err);
+      setCartCount(0);
     }
   }
 

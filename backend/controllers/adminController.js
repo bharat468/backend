@@ -29,8 +29,8 @@ export async function loginAdmin(req, res) {
         // 🔹 FIXED COOKIE SETTINGS (sameSite + secure)
         res.cookie("admin_token", admin_token, {
             httpOnly: true,
-            secure: true,       // <= IMPORTANT
-            sameSite: "none",   // <= IMPORTANT (for cross-site cookies)
+            secure: false,       // <= IMPORTANT
+            sameSite: "lax",   // <= IMPORTANT (for cross-site cookies)
             maxAge: 3600000
         });
 
@@ -59,3 +59,34 @@ export async function logoutAdmin(req, res) {
 export async function updateAdmin(req, res) {
     return res.status(200).json({ message: "Update Admin API ready" });
 }
+
+export async function getUsersByRole(req, res) {
+    try {
+        const { role } = req.query;
+
+        const users = await Auth.find({ role }).select("-password");
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export async function blockUnblockUser(req, res) {
+    try {
+        const { id } = req.params;
+        const { blocked } = req.body;
+
+        const user = await Auth.findByIdAndUpdate(
+            id,
+            { blocked },
+            { new: true }
+        ).select("-password");
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+
+

@@ -1,17 +1,25 @@
-import React from 'react'
-import { Outlet } from "react-router-dom"
-import Header from "../components/Header"
-import Footer from "../components/Footer"
-
+import React from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 function First() {
+  const location = useLocation();
+
+  // ✅ admin route detect
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
     <div>
-      <Header />
+      {/* ❌ Admin panel par Header hide */}
+      {!isAdminRoute && <Header />}
+
       <Outlet />
-      <Footer />
+
+      {/* ❌ Admin panel par Footer hide */}
+      {!isAdminRoute && <Footer />}
     </div>
-  )
+  );
 }
 
-export default First
+export default First;

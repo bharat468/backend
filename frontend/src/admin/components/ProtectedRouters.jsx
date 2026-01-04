@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import instance from "../../axiosConfig";
 import { Navigate } from "react-router-dom";
+import { FaShoppingBag } from "react-icons/fa";
 
 function ProtectedRouters({ children }) {
   const [loading, setLoading] = useState(true);
@@ -32,10 +33,13 @@ function ProtectedRouters({ children }) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-100">
         <div className="flex flex-col items-center gap-4">
-          {/* Spinner */}
-          <div className="w-12 h-12 border-4 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
 
-          {/* Text */}
+          {/* 🔥 SAME PRODUCT PAGE LOADER */}
+          <div className="relative">
+            <FaShoppingBag className="text-5xl text-teal-600 animate-bounce" />
+            <div className="absolute -inset-4 border-2 border-dashed border-teal-400 rounded-full animate-spin"></div>
+          </div>
+
           <p className="text-slate-600 font-medium tracking-wide">
             Checking admin permission...
           </p>

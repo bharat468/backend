@@ -13,6 +13,9 @@ import AdminLogin from "./admin/pages/AdminLogin";
 import AdminHome from "./admin/pages/AdminHome";
 import AddProduct from "./admin/pages/AddProduct";
 import AdminCreateCoupon from "./admin/pages/AdminCreateCoupon";
+import ProductList from "./admin/pages/ProductList";
+import UserList from "./admin/pages/UserList";
+import EditProduct from "./admin/pages/EditProduct";
 
 /* ================= ADMIN COMPONENTS ================= */
 import AdminLayout from "./admin/components/AdminLayout";
@@ -47,9 +50,15 @@ const router = createBrowserRouter([
         ),
         children: [
           { index: true, element: <Navigate to="home" replace /> },
+
           { path: "home", element: <AdminHome /> },
           { path: "product/add", element: <AddProduct /> },
           { path: "coupon/create", element: <AdminCreateCoupon /> },
+          { path: "products", element: <ProductList /> },
+          { path: "users", element: <UserList /> },
+
+          /* ✅ EDIT PRODUCT (SLUG BASED) */
+          { path: "product/edit/:slug", element: <EditProduct /> },
         ],
       },
     ],

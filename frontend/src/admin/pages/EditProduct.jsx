@@ -1,13 +1,16 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import instance from "../../axiosConfig";
 import { toast } from "react-toastify";
-import { FaShoppingBag } from "react-icons/fa";
-import { FaArrowLeft } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaShoppingBag, FaArrowLeft } from "react-icons/fa";
 
-
-function AddProduct() {
+function EditProduct() {
+  const { slug } = useParams();
+  const navigate = useNavigate();
   const imageRef = useRef(null);
+
+  const [loading, setLoading] = useState(true);
+  const [btnLoading, setBtnLoading] = useState(false);
 
   const [data, setData] = useState({
     name: "",
@@ -17,13 +20,42 @@ function AddProduct() {
     originalPrice: "",
     discountedPrice: "",
     image: null,
+    oldImage: "",
   });
 
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  /* ================= BACK ================= */
+  function handleBack() {
+    navigate(-1);
+  }
 
+  /* ================= FETCH PRODUCT ================= */
+  useEffect(() => {
+    fetchProduct();
+  }, []);
 
-  /* ---------------- INPUT CHANGE ---------------- */
+  async function fetchProduct() {
+    try {
+      const res = await instance.get(`/product/${slug}`);
+      const product = res.data;
+
+      setData({
+        name: product.name || "",
+        slug: product.slug || "",
+        category: product.category || "",
+        description: product.description || "",
+        originalPrice: product.originalPrice || "",
+        discountedPrice: product.discountedPrice || "",
+        image: null,
+        oldImage: product.image || "",
+      });
+    } catch {
+      toast.error("Failed to load product");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  /* ================= INPUT CHANGE ================= */
   function handleChange(e) {
     const { name, value, files } = e.target;
 
@@ -38,32 +70,18 @@ function AddProduct() {
       }
 
       if (file.size > 2 * 1024 * 1024) {
-        toast.error("Image size must be under 2MB");
+        toast.error("Image must be under 2MB");
         imageRef.current.value = "";
         return;
       }
 
-      setData({ ...data, image: file });
+      setData(prev => ({ ...prev, image: file }));
     } else {
-      setData({ ...data, [name]: value });
+      setData(prev => ({ ...prev, [name]: value }));
     }
   }
 
-  /* ---------------- CREATE SLUG ---------------- */
-  function createSlug(e) {
-    const value = e.target.value;
-    if (!value) return;
-
-    const slug = value
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-
-    setData((prev) => ({ ...prev, slug }));
-  }
-
-  /* ---------------- SUBMIT ---------------- */
+  /* ================= UPDATE ================= */
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -71,8 +89,7 @@ function AddProduct() {
       data.name.length < 3 ||
       data.category.length < 3 ||
       data.description.length < 10 ||
-      !data.originalPrice ||
-      !data.image
+      !data.originalPrice
     ) {
       toast.warning("Please fill all required fields correctly");
       return;
@@ -87,62 +104,59 @@ function AddProduct() {
     }
 
     const formData = new FormData();
-    Object.keys(data).forEach((key) => {
-      if (data[key] !== "") {
-        formData.append(key, data[key]);
-      }
+    Object.keys(data).forEach(key => {
+      if (data[key]) formData.append(key, data[key]);
     });
 
     try {
-      setLoading(true);
+      setBtnLoading(true);
 
-      await instance.post("/product", formData, {
+      await instance.put(`/product/${slug}`, formData, {
         withCredentials: true,
       });
 
-      toast.success("Product added successfully 🎉");
-
-      setData({
-        name: "",
-        slug: "",
-        category: "",
-        description: "",
-        originalPrice: "",
-        discountedPrice: "",
-        image: null,
-      });
-
-      if (imageRef.current) imageRef.current.value = "";
-    } catch (error) {
-      toast.error("Failed to add product ❌");
+      toast.success("Product updated successfully 🎉");
+      navigate("/admin/products");
+    } catch {
+      toast.error("Failed to update product ❌");
     } finally {
-      setLoading(false);
+      setBtnLoading(false);
     }
   }
 
-    function handleBack() {
-    navigate(-1);
+  /* ================= LOADER ================= */
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-100">
+        <div className="relative">
+          <FaShoppingBag className="text-6xl text-teal-600 animate-bounce" />
+          <div className="absolute -inset-4 border-2 border-dashed border-teal-500 rounded-full animate-spin"></div>
+        </div>
+        <p className="mt-3 text-slate-600">Loading product...</p>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-slate-100 p-6">
-      <div className="flex items-center gap-4 m-6 mb-6">
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-2
-            text-slate-700 hover:text-slate-900
-            font-medium"
-              >
-                <FaArrowLeft />
-                <span className="text-slate-500 text-sm">
-                  Back
-                </span>
-              </button>
-            </div>
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border p-8">
 
+      {/* 🔙 BACK BUTTON */}
+      <div className="max-w-3xl mx-auto mb-6">
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2 text-slate-700 hover:text-slate-900 font-medium"
+        >
+          <span className="p-2 rounded-full border border-slate-300 hover:bg-slate-200 transition">
+            <FaArrowLeft className="text-sm" />
+          </span>
+          <span className="text-sm">Back</span>
+        </button>
+      </div>
+
+      {/* CARD */}
+      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border p-8">
         <h2 className="text-3xl font-bold text-slate-800 mb-6">
-          Add New Product
+          Edit Product
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -157,20 +171,17 @@ function AddProduct() {
               name="name"
               value={data.name}
               onChange={handleChange}
-              onBlur={createSlug}
-              minLength={3}
-              maxLength={100}
-              required
               className="w-full px-4 py-3 border rounded-lg bg-slate-100"
             />
           </div>
 
           {/* SLUG */}
           <div>
-            <label className="block text-sm font-semibold mb-1">Slug</label>
+            <label className="block text-sm font-semibold mb-1">
+              Slug
+            </label>
             <input
               type="text"
-              name="slug"
               value={data.slug}
               readOnly
               className="w-full px-4 py-3 border rounded-lg bg-slate-200 cursor-not-allowed"
@@ -187,9 +198,6 @@ function AddProduct() {
               name="category"
               value={data.category}
               onChange={handleChange}
-              minLength={3}
-              maxLength={50}
-              required
               className="w-full px-4 py-3 border rounded-lg bg-slate-100"
             />
           </div>
@@ -203,13 +211,9 @@ function AddProduct() {
               name="description"
               value={data.description}
               onChange={handleChange}
-              maxLength={500}
               rows={4}
               className="w-full px-4 py-3 border rounded-lg bg-slate-100"
             />
-            <p className="text-xs text-slate-400 text-right">
-              {data.description.length}/500
-            </p>
           </div>
 
           {/* PRICES */}
@@ -223,9 +227,6 @@ function AddProduct() {
                 name="originalPrice"
                 value={data.originalPrice}
                 onChange={handleChange}
-                min={1}
-                max={1000000}
-                required
                 className="w-full px-4 py-3 border rounded-lg bg-slate-100"
               />
             </div>
@@ -239,8 +240,6 @@ function AddProduct() {
                 name="discountedPrice"
                 value={data.discountedPrice}
                 onChange={handleChange}
-                min={0}
-                max={data.originalPrice || 1000000}
                 className="w-full px-4 py-3 border rounded-lg bg-slate-100"
               />
             </div>
@@ -249,41 +248,40 @@ function AddProduct() {
           {/* IMAGE */}
           <div>
             <label className="block text-sm font-semibold mb-1">
-              Product Image (max 2MB)
+              Product Image (optional)
             </label>
             <input
               type="file"
-              name="image"
               ref={imageRef}
+              name="image"
               accept="image/*"
               onChange={handleChange}
-              required
               className="w-full px-4 py-2 border rounded-lg bg-white"
             />
+            {data.oldImage && (
+              <p className="text-xs text-slate-500 mt-1">
+                Old image will remain if not changed
+              </p>
+            )}
           </div>
 
           {/* BUTTON */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={btnLoading}
             className={`w-full py-3 rounded-lg text-white text-lg font-semibold
               bg-gradient-to-r from-slate-900 to-slate-800
-              flex items-center justify-center gap-3
-              ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}
+              flex items-center justify-center gap-2
+              ${btnLoading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}
             `}
           >
-            {loading && (
-              <div className="relative">
-                <FaShoppingBag className="text-xl text-teal-300 animate-bounce" />
-                <div className="absolute -inset-2 border border-dashed border-teal-300 rounded-full animate-spin"></div>
-              </div>
-            )}
-            {loading ? "Adding Product..." : "Add Product"}
+            {btnLoading ? "Updating..." : "Update Product"}
           </button>
+
         </form>
       </div>
     </div>
   );
 }
 
-export default AddProduct;
+export default EditProduct;

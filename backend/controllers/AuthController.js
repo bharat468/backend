@@ -150,3 +150,32 @@ export async function deleteUser(req, res) {
       .json({ message: "Server Error", error: error.message });
   }
 }
+
+
+// export async function UserRole(req, res) {
+//   try {
+//     const { role } = req.query;
+
+//     const users = await Auth.find({ role }).select("-password");
+//     res.status(200).json(users);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// }
+
+// export async function UserBlock(req, res) {
+//   try {
+//     const { id } = req.params;
+//     const { blocked } = req.body;
+
+//     const user = await Auth.findByIdAndUpdate(
+//       id,
+//       { blocked },
+//       { new: true }
+//     );
+
+//     res.status(200).json(user);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// }

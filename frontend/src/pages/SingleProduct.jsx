@@ -5,6 +5,8 @@ import { PiCurrencyInrLight } from "react-icons/pi";
 import { useAuth } from "../contexts/AuthProvider";
 import { useCart } from "../contexts/CartContext";
 import { toast } from "react-toastify";
+import { FaArrowLeft } from "react-icons/fa";
+
 
 const SingleProduct = () => {
   const { slug } = useParams();
@@ -17,18 +19,24 @@ const SingleProduct = () => {
   const [alreadyInCart, setAlreadyInCart] = useState(false);
   const [btnLoading, setBtnLoading] = useState(false);
 
+
   // 🔹 Fetch product
   async function getSingleData() {
     try {
       setLoading(true);
       const res = await instance.get("/product/" + slug);
-      setProduct(res.data[0]);
+      setProduct(res.data);
     } catch {
       toast.error("Failed to load product");
     } finally {
       setLoading(false);
     }
   }
+
+  function handleBack() {
+    navigate(-1);
+  }
+
 
   // 🔹 Check cart
   async function checkCart(prodId) {
@@ -38,7 +46,7 @@ const SingleProduct = () => {
         (item) => item.productId._id === prodId
       );
       if (found) setAlreadyInCart(true);
-    } catch {}
+    } catch { }
   }
 
   // 🔹 Add to cart
@@ -88,6 +96,21 @@ const SingleProduct = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen">
+      {/* 🔝 TOP BAR (WEBSITE STYLE BACK) */}
+      <div className="flex items-center gap-4 mx-6 py-5 mb-6">
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2
+      text-slate-700 hover:text-slate-900
+      font-medium"
+        >
+          <FaArrowLeft />
+          <span className="text-slate-500 text-sm">
+            Back
+          </span>
+        </button>
+      </div>
+
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 gap-12">
 
         {/* IMAGE */}
@@ -133,18 +156,17 @@ const SingleProduct = () => {
             onClick={handleAddToCart}
             disabled={alreadyInCart || btnLoading}
             className={`mt-4 px-6 py-3 rounded-lg font-semibold
-              ${
-                alreadyInCart
-                  ? "bg-slate-300 cursor-not-allowed"
-                  : "bg-teal-600 hover:bg-teal-700 text-white"
+              ${alreadyInCart
+                ? "bg-slate-300 cursor-not-allowed"
+                : "bg-teal-600 hover:bg-teal-700 text-white"
               }
             `}
           >
             {btnLoading
               ? "Adding..."
               : alreadyInCart
-              ? "Already in Cart"
-              : "Add to Cart"}
+                ? "Already in Cart"
+                : "Add to Cart"}
           </button>
         </div>
       </div>

@@ -9,6 +9,7 @@ const authSchema = new Schema({
     image: { type: String },
     authProvider: { type: String, enum: ["local", "google"], default: "local", },
     googleId: { type: String, unique: true, sparse: true },
+    blocked: { type: Boolean, default: false },
     role: { type: String }
 })
 

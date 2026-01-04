@@ -32,7 +32,7 @@ function Header() {
           onClick={() => setMenuOpen(false)}
           className="text-2xl font-bold text-white tracking-wide hover:opacity-90 transition"
         >
-          Ecommerce
+          LIMESTONE WATCH
         </Link>
 
         {/* MOBILE MENU ICON */}

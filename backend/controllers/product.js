@@ -1,101 +1,126 @@
-import Product from "../models/productmodel.js"
-import multer from "multer";
+import Product from "../models/productmodel.js";
 
-
+/* ================= ADD PRODUCT ================= */
 export async function addProduct(req, res) {
-    try {
-        const newRecord = req.body;
-        newRecord.image = req.file.path;
-        const newProduct = new Product(newRecord);
-        await newProduct.save();
-        return res.status(201).json(newProduct);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-}
-
-export async function getSingleProduct(req, res) {
   try {
-    const { slug } = req.params;
-    if (!slug) {
-      res.status(400).json({ message: "slug required" });
-      return;
+    const newRecord = req.body;
+
+    if (req.file) {
+      newRecord.image = req.file.path;
     }
-    const singleProduct = await Product.find({slug:slug});
-    return res.status(200).json(singleProduct);
+
+    const newProduct = new Product(newRecord);
+    await newProduct.save();
+
+    return res.status(201).json(newProduct);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 }
 
+/* ================= GET SINGLE PRODUCT (BY SLUG) ================= */
+export async function getSingleProduct(req, res) {
+  try {
+    const { slug } = req.params;
 
+    if (!slug) {
+      return res.status(400).json({ message: "slug required" });
+    }
+
+    const product = await Product.findOne({ slug });
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.status(200).json(product);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+/* ================= GET ALL PRODUCTS ================= */
 export async function getProduct(req, res) {
-    try {
-        const products = await Product.find();
-        return res.status(200).json(products);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
+  try {
+    const products = await Product.find();
+    return res.status(200).json(products);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 }
 
+/* ================= UPDATE PRODUCT (BY SLUG) ================= */
 export async function updateProduct(req, res) {
-    try {
-        const { id } = req.params;
-        const updatedRecord = req.body;
-        if (!id) {
-            return res.status(400).json({ message: "ID parameter is required" });
-        }
-        if (!updatedRecord) {
-            return res    
-                .status(400)
-                .json({ message: "Updated product schema is required" });
-        }
+  try {
+    const { slug } = req.params;
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, updatedRecord, {
-            new: true,
-        });
-        if (!updatedProduct)
-            return res.status(404).json({ message: "Could not update this product" });
-        return res
-            .status(200)
-            .json({ message: "Product Updated", product: updatedProduct });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+    if (!slug) {
+      return res.status(400).json({ message: "slug required" });
     }
+
+    const updatedData = req.body;
+
+    if (req.file) {
+      updatedData.image = req.file.path;
+    }
+
+    const updatedProduct = await Product.findOneAndUpdate(
+      { slug },
+      updatedData,
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      message: "Product updated successfully",
+      product: updatedProduct,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 }
 
+/* ================= DELETE PRODUCT (BY SLUG) ================= */
 export async function deleteProduct(req, res) {
-    try {
-        const { id } = req.params;
-        if (!id) {
-            return res.status(400).json({ message: "ID parameter is required" });
-        }
-        const deletedProduct = await Product.findByIdAndDelete(id);
-        if (!deletedProduct) {
-            return res.status(404).json({ message: "ID not found" });
-        }
-        return res
-            .status(200)
-            .json({ message: "Product with id " + id + " successfully deleted" });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+  try {
+    const { slug } = req.params;
+
+    if (!slug) {
+      return res.status(400).json({ message: "slug required" });
     }
+
+    const deletedProduct = await Product.findOneAndDelete({ slug });
+
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 }
 
+/* ================= CHECK SLUG ================= */
 export async function checkSlug(req, res) {
-    try {
-        const { slug } = req.params
-        if (!slug) {
-            res.status(400).json({ message: "slug required" })
-        }
+  try {
+    const { slug } = req.params;
 
-        const existing = await Product.findOne({ slug })
-
-        if (existing) {
-            return res.status(400).json({ message: "Slug already exists" })
-        }
-
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+    if (!slug) {
+      return res.status(400).json({ message: "slug required" });
     }
+
+    const existing = await Product.findOne({ slug });
+
+    if (existing) {
+      return res.status(400).json({ message: "Slug already exists" });
+    }
+
+    return res.status(200).json({ message: "Slug available" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 }
