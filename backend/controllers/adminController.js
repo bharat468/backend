@@ -30,7 +30,7 @@ export async function loginAdmin(req, res) {
         res.cookie("admin_token", admin_token, {
             httpOnly: true,
             secure: false,       // <= IMPORTANT
-            sameSite: "lax",   // <= IMPORTANT (for cross-site cookies)
+            sameSite: process.env.sameSite ? process.env.sameSite : "lax",   // <= IMPORTANT (for cross-site cookies)
             maxAge: 3600000
         });
 
@@ -46,7 +46,7 @@ export async function logoutAdmin(req, res) {
         res.clearCookie("admin_token", {
             httpOnly: true,
             secure: true,
-            sameSite: "none",
+            sameSite: process.env.sameSite ? process.env.sameSite : "lax",
             maxAge: -1
         });
 
