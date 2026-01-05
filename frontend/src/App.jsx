@@ -26,6 +26,7 @@ import ProtectedRouters from "./admin/components/ProtectedRouters";
 /* ================= CONTEXT ================= */
 import AuthProvider from "./contexts/AuthProvider";
 import { CartProvider } from "./contexts/CartContext";
+import About from "./pages/About";
 
 /* ================= ROUTER ================= */
 const router = createBrowserRouter([
@@ -43,6 +44,8 @@ const router = createBrowserRouter([
       { path: "register", element: <Register /> },
       { path: "product/:slug", element: <SingleProduct /> },
       { path: "cart", element: <Cart /> },
+      { path: "about", element: <About/> },
+
     ],
   },
 

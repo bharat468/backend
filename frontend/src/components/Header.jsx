@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import instance from "../axiosConfig";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthProvider";
+import { RiContactsBook3Fill } from "react-icons/ri";
+
 
 function Header() {
   const navigate = useNavigate();
@@ -63,6 +65,15 @@ function Header() {
         >
 
           {/* 🔓 NOT LOGGED IN */}
+          <Link
+            to="/about"
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-3 text-slate-200 hover:text-white"
+          >
+            <RiContactsBook3Fill />
+            About
+          </Link>
+
           {!isLoggedIn && (
             <>
               <Link
