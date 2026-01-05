@@ -81,7 +81,7 @@ export async function loginUser(req, res) {
     );
     res.cookie("auth_token", auth_token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: process.env.sameSite ? process.env.sameSite : "lax",
       maxAge: 3600 * 1000,
     });
@@ -98,7 +98,7 @@ export async function logoutUser(req, res) {
   try {
     res.clearCookie("auth_token", {
       httpOnly: true,
-      secure: false,   // 🔥 SAME AS LOGIN
+      secure: true,   // 🔥 SAME AS LOGIN
       sameSite: process.env.sameSite ? process.env.sameSite : "lax", // 🔥 SAME AS LOGIN
     });
 

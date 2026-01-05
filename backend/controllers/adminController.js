@@ -29,7 +29,7 @@ export async function loginAdmin(req, res) {
         // 🔹 FIXED COOKIE SETTINGS (sameSite + secure)
         res.cookie("admin_token", admin_token, {
             httpOnly: true,
-            secure: false,       // <= IMPORTANT
+            secure: true,       // <= IMPORTANT
             sameSite: process.env.sameSite ? process.env.sameSite : "lax",   // <= IMPORTANT (for cross-site cookies)
             maxAge: 3600000
         });
