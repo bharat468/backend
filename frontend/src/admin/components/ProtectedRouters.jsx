@@ -12,21 +12,26 @@ function ProtectedRouters({ children }) {
   }, []);
 
   async function checkForLogin() {
-    try {
-      const res = await instance.get(
-        "/check/login?referer=admin",
-        { withCredentials: true }
-      );
+  try {
+    const res = await instance.get(
+      "/check/login?referer=admin",
+      { withCredentials: true }
+    );
 
-      if (res.status === 200) {
-        setAllowed(true);
-      }
-    } catch (err) {
-      console.log("Not allowed", err);
-    } finally {
-      setLoading(false);
+    // ✅ STRICT ADMIN CHECK
+    if (res.data?.loggedIn === true && res.data?.role === "admin") {
+      setAllowed(true);
+    } else {
+      setAllowed(false);
     }
+
+  } catch (err) {
+    console.log("Not allowed", err);
+    setAllowed(false);
+  } finally {
+    setLoading(false);
   }
+}
 
   /* ================= LOADING UI ================= */
   if (loading) {
