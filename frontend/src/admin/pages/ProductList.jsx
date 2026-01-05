@@ -123,7 +123,7 @@ function ProductList() {
                     <img
                       src={
                         product.image
-                          ? `${BASE_URL}/${product.image}`
+                          ? `${instance}/${product.image}`
                           : "https://via.placeholder.com/60"
                       }
                       alt={product.name}
