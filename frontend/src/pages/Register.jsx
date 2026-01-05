@@ -20,7 +20,7 @@ function Register() {
 
   function handleChange(e) {
     const { name, value } = e.target;
-
+    if (name === "name" && !/^[A-Za-z\s]*$/.test(value)) return;
     // ✅ phone → only numbers
     if (name === "phone" && !/^\d*$/.test(value)) return;
 
@@ -29,6 +29,9 @@ function Register() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
 
     if (
       !data.name ||
@@ -43,6 +46,14 @@ function Register() {
 
     if (data.phone.length !== 10) {
       toast.warning("Enter a valid 10 digit phone number");
+      return;
+    }
+
+    // 🔐 PASSWORD VALIDATION
+    if (!passwordRegex.test(data.password)) {
+      toast.warning(
+        "Password must be at least 8 characters and include 1 capital letter, 1 number, and 1 special character"
+      );
       return;
     }
 
@@ -63,10 +74,8 @@ function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
 
-      {/* CARD */}
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
 
-        {/* TITLE */}
         <h2 className="text-center text-3xl font-bold text-slate-800">
           Create Account
         </h2>
@@ -74,7 +83,6 @@ function Register() {
           Join us and start shopping
         </p>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-5">
 
           {/* NAME */}
@@ -87,10 +95,8 @@ function Register() {
               name="name"
               value={data.name}
               onChange={handleChange}
-              placeholder="Enter your name"
-              className="w-full px-4 py-3 rounded-lg border border-slate-300
-              bg-slate-100 focus:outline-none focus:ring-2
-              focus:ring-slate-800"
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100
+              focus:outline-none focus:ring-2 focus:ring-slate-800"
               required
             />
           </div>
@@ -103,15 +109,11 @@ function Register() {
             <input
               type="tel"
               name="phone"
-              inputMode="numeric"
-              pattern="[0-9]*"
               maxLength={10}
               value={data.phone}
               onChange={handleChange}
-              placeholder="Enter phone number"
-              className="w-full px-4 py-3 rounded-lg border border-slate-300
-              bg-slate-100 focus:outline-none focus:ring-2
-              focus:ring-slate-800"
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100
+              focus:outline-none focus:ring-2 focus:ring-slate-800"
               required
             />
           </div>
@@ -126,10 +128,8 @@ function Register() {
               name="username"
               value={data.username}
               onChange={handleChange}
-              placeholder="Choose a username"
-              className="w-full px-4 py-3 rounded-lg border border-slate-300
-              bg-slate-100 focus:outline-none focus:ring-2
-              focus:ring-slate-800"
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100
+              focus:outline-none focus:ring-2 focus:ring-slate-800"
               required
             />
           </div>
@@ -142,13 +142,10 @@ function Register() {
             <input
               type="email"
               name="email"
-              inputMode="email"
               value={data.email}
               onChange={handleChange}
-              placeholder="Enter your email"
-              className="w-full px-4 py-3 rounded-lg border border-slate-300
-              bg-slate-100 focus:outline-none focus:ring-2
-              focus:ring-slate-800"
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100
+              focus:outline-none focus:ring-2 focus:ring-slate-800"
               required
             />
           </div>
@@ -164,38 +161,37 @@ function Register() {
                 name="password"
                 value={data.password}
                 onChange={handleChange}
-                placeholder="Create a password"
-                className="w-full px-4 py-3 pr-12 rounded-lg border border-slate-300
-                bg-slate-100 focus:outline-none focus:ring-2
-                focus:ring-slate-800"
+                className="w-full px-4 py-3 pr-12 rounded-lg border border-slate-300 bg-slate-100
+                focus:outline-none focus:ring-2 focus:ring-slate-800"
                 required
               />
-
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute top-1/2 right-4 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+                className="absolute top-1/2 right-4 -translate-y-1/2 text-slate-500"
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
+
+            {/* PASSWORD HINT */}
+            <p className="text-xs text-slate-500 mt-1">
+              Must contain 1 capital letter, 1 number, 1 special character & minimum 8 characters
+            </p>
           </div>
 
-          {/* LOGIN LINK */}
           <Link
             to="/login"
-            className="block text-center text-sm font-medium text-slate-700 hover:underline"
+            className="block text-center text-sm text-slate-700 hover:underline"
           >
             Already have an account? Login
           </Link>
 
-          {/* BUTTON */}
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-lg text-white text-lg font-semibold
+            className={`w-full py-3 rounded-lg text-white font-semibold
               bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
-              transition shadow-md
               ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}
             `}
           >
