@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from "react";
 import instance from "../../axiosConfig";
-import { FaEdit, FaTrash, FaPlus, FaShoppingBag, FaArrowLeft } from "react-icons/fa";
+import {
+  FaEdit,
+  FaTrash,
+  FaPlus,
+  FaShoppingBag,
+  FaArrowLeft,
+} from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-// const BASE_URL = "http://localhost:3000";
+/* 🔥 IMAGE URL RESOLVER (MOST IMPORTANT) */
+const getImageSrc = (image) => {
+  if (!image) return "https://via.placeholder.com/60";
+  if (image.startsWith("http")) return image; // already full URL
+  return `${instance.defaults.baseURL}/${image}`; // relative path
+};
 
 function ProductList() {
   const navigate = useNavigate();
@@ -34,18 +45,14 @@ function ProductList() {
     }
   }
 
-  /* ================= DELETE BY SLUG ================= */
+  /* ================= DELETE PRODUCT ================= */
   async function deleteProduct(slug) {
     try {
       setDeletingSlug(slug);
       await instance.delete(`/product/${slug}`);
-
-      setProducts(prev =>
-        prev.filter(item => item.slug !== slug)
-      );
-
+      setProducts((prev) => prev.filter((p) => p.slug !== slug));
       toast.success("Product deleted successfully");
-    } catch (err) {
+    } catch {
       toast.error("Failed to delete product");
     } finally {
       setDeletingSlug("");
@@ -56,10 +63,7 @@ function ProductList() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center bg-slate-100">
-        <div className="relative">
-          <FaShoppingBag className="text-6xl text-teal-600 animate-bounce" />
-          <div className="absolute -inset-4 border-2 border-dashed border-teal-500 rounded-full animate-spin"></div>
-        </div>
+        <FaShoppingBag className="text-6xl text-teal-600 animate-bounce" />
         <p className="mt-3 text-slate-600">Loading products...</p>
       </div>
     );
@@ -67,29 +71,22 @@ function ProductList() {
 
   return (
     <div className="p-6">
-
-      {/* 🔙 BACK BUTTON */}
-      <div className="mb-6">
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-2 text-slate-700 hover:text-slate-900 font-medium"
-        >
-          <span className="p-2 rounded-full border border-slate-300 hover:bg-slate-200 transition">
-            <FaArrowLeft className="text-sm" />
-          </span>
-          <span className="text-sm">Back</span>
-        </button>
-      </div>
+      {/* 🔙 BACK */}
+      <button
+        onClick={handleBack}
+        className="mb-6 flex items-center gap-2 text-slate-700 hover:text-slate-900"
+      >
+        <FaArrowLeft />
+        <span className="text-sm">Back</span>
+      </button>
 
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-slate-800">
-          All Products
-        </h2>
+        <h2 className="text-2xl font-bold text-slate-800">All Products</h2>
 
         <Link
           to="/admin/product/add"
-          className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition"
+          className="flex items-center gap-2 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700"
         >
           <FaPlus /> Add Product
         </Link>
@@ -115,26 +112,19 @@ function ProductList() {
                 </td>
               </tr>
             ) : (
-              products.map(product => (
+              products.map((product) => (
                 <tr key={product.slug} className="border-t">
-
                   {/* IMAGE */}
                   <td className="p-3">
                     <img
-                      src={
-                        product.image
-                          ? `${instance.defaults.baseURL}/${product.image}`
-                          : "https://via.placeholder.com/60"
-                      }
+                      src={getImageSrc(product.image)}
                       alt={product.name}
                       className="w-14 h-14 object-cover rounded border"
                     />
                   </td>
 
                   {/* NAME */}
-                  <td className="p-3 font-medium">
-                    {product.name}
-                  </td>
+                  <td className="p-3 font-medium">{product.name}</td>
 
                   {/* PRICE */}
                   <td className="p-3 font-semibold text-teal-600">
@@ -161,7 +151,6 @@ function ProductList() {
                       )}
                     </button>
                   </td>
-
                 </tr>
               ))
             )}
