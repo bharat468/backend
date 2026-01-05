@@ -20,29 +20,46 @@ export async function checkAuth(req, res, next) {
 
 
 export async function checkForlogin(req, res) {
-    try {
-        if (!req.query)
-            return res.status(422).json({
-                message: "no referer query parameter, access denied"
-            })
+  try {
+    const { referer } = req.query;
 
-        let token;
-
-        if (req.query.referer === "admin") token = req.cookies.admin_token;
-        if (req.query.referer === "user") token = req.cookies.auth_token;
-
-        if (!token) {
-            return res.status(401).json({ message: "no authentication token, accesss denied" })
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        if (decoded.role === req.query.referer) {
-            console.log("object");
-            return res.status(200).json({ message: "token verified" })
-        }
+    if (!referer) {
+      return res.status(422).json({
+        loggedIn: false,
+        message: "referer missing",
+      });
     }
 
-    catch (error) {
-        return res.status(500).json({ message: error.message })
+    let token;
+
+    if (referer === "admin") token = req.cookies.admin_token;
+    if (referer === "user") token = req.cookies.auth_token;
+
+    if (!token) {
+      return res.status(200).json({
+        loggedIn: false,
+      });
     }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 🔐 role match check
+    if (decoded.role !== referer) {
+      return res.status(200).json({
+        loggedIn: false,
+      });
+    }
+
+    // ✅ SUCCESS
+    return res.status(200).json({
+      loggedIn: true,
+      role: decoded.role,
+      userId: decoded.id,
+    });
+
+  } catch (error) {
+    return res.status(200).json({
+      loggedIn: false,
+    });
+  }
 }

@@ -6,7 +6,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "react-toastify";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-function Login() {
+function Login() { 
   const { checkIsLoggedIn, setIsLoggedIn } = useAuth();
   const navigate = useNavigate();
 

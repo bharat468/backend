@@ -1,31 +1,31 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import instance from "../axiosConfig";
+import { useAuth } from "./AuthProvider";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartCount, setCartCount] = useState(0);
+  const { isLoggedIn } = useAuth();
 
   async function fetchCartCount() {
     try {
-      const res = await instance.get("/cart", {
-        withCredentials: true,
-      });
+      const res = await instance.get("/cart");
 
-      // ✅ same clean logic as Cart page
       const cleanCart = res.data.filter(item => item.productId);
-
-      // ✅ ONLY product length (NOT quantity)
       setCartCount(cleanCart.length);
-    } catch (err) {
-      console.log(err);
+    } catch {
       setCartCount(0);
     }
   }
 
   useEffect(() => {
-    fetchCartCount();
-  }, []);
+    if (isLoggedIn) {
+      fetchCartCount();
+    } else {
+      setCartCount(0);
+    }
+  }, [isLoggedIn]);
 
   return (
     <CartContext.Provider value={{ cartCount, fetchCartCount }}>

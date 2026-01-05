@@ -12,22 +12,15 @@ function AuthProvider({ children }) {
 
   async function checkIsLoggedIn() {
     try {
-      const response = await instance.get("/check/login?referer=user", {
-        withCredentials: true,
-      });
-
-      if (response.status === 200) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn(false);
-      }
+      const res = await instance.get("/check/login?referer=user");
+      setIsLoggedIn(res.data.loggedIn === true);
     } catch {
       setIsLoggedIn(false);
     }
   }
 
   return (
-    <authContext.Provider value={{ isLoggedIn, checkIsLoggedIn, setIsLoggedIn }}>
+    <authContext.Provider value={{ isLoggedIn, setIsLoggedIn, checkIsLoggedIn }}>
       {children}
     </authContext.Provider>
   );

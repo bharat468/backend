@@ -12,20 +12,17 @@ const Cart = () => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  /* ================= FETCH CART ================= */
   useEffect(() => {
     getCart();
   }, []);
 
-  /* ================= FETCH CART ================= */
   async function getCart() {
     try {
       setLoading(true);
-      const res = await instance.get("/cart", { withCredentials: true });
-
-      // ✅ remove broken cart items (product deleted)
+      const res = await instance.get("/cart");
       const cleanCart = res.data.filter(item => item.productId);
       setCart(cleanCart);
-
       fetchCartCount();
     } catch {
       toast.error("Failed to load cart");
@@ -34,40 +31,30 @@ const Cart = () => {
     }
   }
 
-  /* ================= UPDATE QTY (NO PAGE RELOAD) ================= */
+  /* ================= UPDATE QTY ================= */
   async function updateQty(cartId, qty) {
     if (qty < 1) return;
 
-    // ✅ instant UI update (optimistic)
     setCart(prev =>
       prev.map(item =>
-        item._id === cartId
-          ? { ...item, quantity: qty }
-          : item
+        item._id === cartId ? { ...item, quantity: qty } : item
       )
     );
 
     try {
-      await instance.put(
-        "/cart/update",
-        { cartId, quantity: qty },
-        { withCredentials: true }
-      );
+      await instance.put("/cart/update", { cartId, quantity: qty });
     } catch {
       toast.error("Failed to update quantity");
-      getCart(); // fallback
+      getCart();
     }
   }
 
   /* ================= REMOVE ITEM ================= */
   async function removeItem(cartId) {
-    // ✅ instant remove from UI
     setCart(prev => prev.filter(item => item._id !== cartId));
 
     try {
-      await instance.delete(`/cart/remove/${cartId}`, {
-        withCredentials: true,
-      });
+      await instance.delete(`/cart/remove/${cartId}`);
       toast.success("Item removed");
       fetchCartCount();
     } catch {
@@ -76,13 +63,11 @@ const Cart = () => {
     }
   }
 
-  /* ================= TOTAL (100% SAFE) ================= */
+  /* ================= TOTAL ================= */
   const totalAmount = cart.reduce((sum, item) => {
-    if (!item.productId) return sum;
-
     const price =
-      item.productId.discountedPrice ??
-      item.productId.originalPrice ??
+      item.productId?.discountedPrice ??
+      item.productId?.originalPrice ??
       0;
 
     return sum + price * item.quantity;
@@ -101,26 +86,32 @@ const Cart = () => {
 
         setDiscountPercent(percent);
         setDiscountAmount(calc);
-
         toast.success(`Coupon applied! You saved ₹${calc.toFixed(2)}`);
       }
     } catch (error) {
+      clearCoupon();
       toast.error(error.response?.data?.message || "Invalid coupon");
     }
   }
 
+  function clearCoupon() {
+    setCouponCode("");
+    setDiscountPercent(0);
+    setDiscountAmount(0);
+    toast.info("Coupon cleared");
+  }
+
   const finalAmount = totalAmount - discountAmount;
 
-  /* ================= LOADING ================= */
   if (loading) {
     return <p className="text-center py-20">Loading cart...</p>;
   }
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
 
-        <h1 className="text-3xl font-bold mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-8">
           Your Cart
         </h1>
 
@@ -131,33 +122,31 @@ const Cart = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {/* CART ITEMS */}
+            {/* LEFT - CART ITEMS */}
             <div className="lg:col-span-2 space-y-4">
               {cart.map(item => (
                 <div
                   key={item._id}
-                  className="bg-white rounded-xl shadow p-4 flex gap-4"
+                  className="bg-white rounded-xl shadow p-4
+                             flex flex-col sm:flex-row gap-4"
                 >
                   <img
                     src={`${instance.defaults.baseURL}/${item.productId?.image}`}
                     alt={item.productId?.name}
-                    className="w-24 h-24 object-contain bg-slate-100 rounded"
+                    className="w-24 h-24 object-contain bg-slate-100 rounded mx-auto sm:mx-0"
                   />
 
                   <div className="flex-1">
-                    <h3 className="font-semibold">
-                      {item.productId?.name || "Product removed"}
+                    <h3 className="font-semibold text-sm sm:text-base">
+                      {item.productId?.name}
                     </h3>
 
                     <p className="text-teal-600 font-bold mt-1">
                       ₹{" "}
-                      {item.productId
-                        ? item.productId.discountedPrice ??
-                          item.productId.originalPrice
-                        : 0}
+                      {item.productId.discountedPrice ??
+                        item.productId.originalPrice}
                     </p>
 
-                    {/* QTY */}
                     <div className="flex items-center gap-3 mt-3">
                       <button
                         onClick={() =>
@@ -183,7 +172,7 @@ const Cart = () => {
 
                   <button
                     onClick={() => removeItem(item._id)}
-                    className="text-red-500"
+                    className="text-red-500 text-sm self-start sm:self-center"
                   >
                     Remove
                   </button>
@@ -191,41 +180,62 @@ const Cart = () => {
               ))}
             </div>
 
-            {/* SUMMARY */}
-            <div className="bg-white rounded-xl shadow p-6 space-y-4">
-              <p className="flex justify-between">
-                <span>Total</span>
-                <span>₹ {totalAmount.toFixed(2)}</span>
-              </p>
+            {/* RIGHT - SUMMARY */}
+            <div className="relative">
+              <div className="bg-white rounded-xl shadow p-6 space-y-5
+                              lg:sticky lg:top-[120px]">
 
-              <div className="flex gap-2">
-                <input
-                  value={couponCode}
-                  onChange={e => setCouponCode(e.target.value)}
-                  placeholder="Coupon code"
-                  className="border px-3 py-2 rounded flex-1"
-                />
-                <button
-                  onClick={applyCoupon}
-                  className="bg-teal-600 text-white px-4 rounded"
-                >
-                  Apply
-                </button>
+                {/* TOTAL */}
+                <div className="flex justify-between font-medium">
+                  <span>Total</span>
+                  <span>₹ {totalAmount.toFixed(2)}</span>
+                </div>
+
+                {/* COUPON */}
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      value={couponCode}
+                      onChange={e => setCouponCode(e.target.value)}
+                      placeholder="Coupon code"
+                      className="border px-3 py-2 rounded flex-1"
+                    />
+
+                    <button
+                      onClick={applyCoupon}
+                      className="bg-teal-600 text-white px-4 py-2 rounded"
+                    >
+                      Apply
+                    </button>
+                  </div>
+
+                  {discountPercent > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-green-600">
+                        Discount: -₹ {discountAmount.toFixed(2)}
+                      </span>
+
+                      <button
+                        onClick={clearCoupon}
+                        className="text-slate-500 hover:text-red-500 underline"
+                      >
+                        Clear coupon
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <hr />
+
+                {/* FINAL */}
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Final</span>
+                  <span>₹ {finalAmount.toFixed(2)}</span>
+                </div>
+
               </div>
-
-              {discountPercent > 0 && (
-                <p className="text-green-600">
-                  Discount: -₹ {discountAmount.toFixed(2)}
-                </p>
-              )}
-
-              <hr />
-
-              <p className="flex justify-between font-bold text-lg">
-                <span>Final</span>
-                <span>₹ {finalAmount.toFixed(2)}</span>
-              </p>
             </div>
+
           </div>
         )}
       </div>
