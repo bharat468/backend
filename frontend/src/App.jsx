@@ -16,6 +16,8 @@ import AdminCreateCoupon from "./admin/pages/AdminCreateCoupon";
 import ProductList from "./admin/pages/ProductList";
 import UserList from "./admin/pages/UserList";
 import EditProduct from "./admin/pages/EditProduct";
+import CouponList from "./admin/pages/CouponList";
+import EditCoupon from "./admin/pages/EditCoupon";
 
 /* ================= ADMIN COMPONENTS ================= */
 import AdminLayout from "./admin/components/AdminLayout";
@@ -25,42 +27,46 @@ import ProtectedRouters from "./admin/components/ProtectedRouters";
 import AuthProvider from "./contexts/AuthProvider";
 import { CartProvider } from "./contexts/CartContext";
 
+/* ================= ROUTER ================= */
 const router = createBrowserRouter([
+  /* ========== USER SIDE ========== */
   {
     path: "/",
-    element: <First />,
+    element: (
+      <CartProvider>
+        <First />
+      </CartProvider>
+    ),
     children: [
-      /* ---------- USER ROUTES ---------- */
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "product/:slug", element: <SingleProduct /> },
       { path: "cart", element: <Cart /> },
+    ],
+  },
 
-      /* ---------- ADMIN LOGIN ---------- */
-      { path: "admin/login", element: <AdminLogin /> },
+  /* ========== ADMIN LOGIN ========== */
+  { path: "/admin/login", element: <AdminLogin /> },
 
-      /* ---------- ADMIN PROTECTED AREA ---------- */
-      {
-        path: "admin",
-        element: (
-          <ProtectedRouters>
-            <AdminLayout />
-          </ProtectedRouters>
-        ),
-        children: [
-          { index: true, element: <Navigate to="home" replace /> },
-
-          { path: "home", element: <AdminHome /> },
-          { path: "product/add", element: <AddProduct /> },
-          { path: "coupon/create", element: <AdminCreateCoupon /> },
-          { path: "products", element: <ProductList /> },
-          { path: "users", element: <UserList /> },
-
-          /* ✅ EDIT PRODUCT (SLUG BASED) */
-          { path: "product/edit/:slug", element: <EditProduct /> },
-        ],
-      },
+  /* ========== ADMIN PROTECTED ========== */
+  {
+    path: "/admin",
+    element: (
+      <ProtectedRouters>
+        <AdminLayout />
+      </ProtectedRouters>
+    ),
+    children: [
+      { index: true, element: <Navigate to="home" replace /> },
+      { path: "home", element: <AdminHome /> },
+      { path: "product/add", element: <AddProduct /> },
+      { path: "product/edit/:slug", element: <EditProduct /> },
+      { path: "products", element: <ProductList /> },
+      { path: "users", element: <UserList /> },
+      { path: "coupon/create", element: <AdminCreateCoupon /> },
+      { path: "coupons", element: <CouponList /> },
+      { path: "coupon/edit/:id", element: <EditCoupon /> },
     ],
   },
 ]);
@@ -68,9 +74,7 @@ const router = createBrowserRouter([
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <RouterProvider router={router} />
-      </CartProvider>
+      <RouterProvider router={router} />
     </AuthProvider>
   );
 }

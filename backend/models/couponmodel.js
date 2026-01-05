@@ -1,13 +1,14 @@
-import { Schema, model } from "mongoose";
+import mongoose from "mongoose";
 
-const couponSchema = new Schema(
+const couponSchema = new mongoose.Schema(
   {
     code: { type: String, required: true, unique: true },
-    discountPercent: { type: Number, required: true }, // like 10,20,30
+    discountPercent: { type: Number, required: true },
+    startDate: { type: Date, required: true },
+    expiresAt: { type: Date, required: true },
     isActive: { type: Boolean, default: true },
-    expiresAt: { type: Date },
   },
   { timestamps: true }
 );
 
-export default model("Coupon", couponSchema);
+export default mongoose.model("Coupon", couponSchema);

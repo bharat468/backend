@@ -46,7 +46,9 @@ const SingleProduct = () => {
         (item) => item.productId._id === prodId
       );
       if (found) setAlreadyInCart(true);
-    } catch { }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   // 🔹 Add to cart
