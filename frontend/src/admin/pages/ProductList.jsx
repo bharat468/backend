@@ -4,7 +4,7 @@ import { FaEdit, FaTrash, FaPlus, FaShoppingBag, FaArrowLeft } from "react-icons
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const BASE_URL = "http://localhost:3000";
+// const BASE_URL = "http://localhost:3000";
 
 function ProductList() {
   const navigate = useNavigate();
@@ -123,7 +123,7 @@ function ProductList() {
                     <img
                       src={
                         product.image
-                          ? `${instance}/${product.image}`
+                          ? `${instance.defaults.baseURL}/${product.image}`
                           : "https://via.placeholder.com/60"
                       }
                       alt={product.name}
