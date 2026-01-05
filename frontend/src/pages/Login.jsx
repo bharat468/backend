@@ -23,25 +23,25 @@ function Login() {
     setData({ ...data, [name]: value });
   }
 
- async function handleSubmit(e) {
-  e.preventDefault();
+  async function handleSubmit(e) {
+    e.preventDefault();
 
-  try {
-    const res = await instance.post("/user/login", data);
-    if (res.status === 200) {
-      checkIsLoggedIn();
+    try {
+      const res = await instance.post("/user/login", data);
+      if (res.status === 200) {
+        checkIsLoggedIn();
 
-      // ✅ READ nextPage
-      const params = new URLSearchParams(window.location.search);
-      const nextPage = params.get("nextPage");
+        // ✅ READ nextPage
+        const params = new URLSearchParams(window.location.search);
+        const nextPage = params.get("nextPage");
 
-      // ✅ Go back to same product page
-      navigate(nextPage || "/");
+        // ✅ Go back to same product page
+        navigate(nextPage || "/");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Invalid email or password");
     }
-  } catch {
-    toast.error("Invalid email or password");
   }
-}
 
 
   async function handleGoogleSuccess(res) {

@@ -59,6 +59,13 @@ export async function loginUser(req, res) {
     if (!user) {
       return res.status(404).json({ message: "email not found" });
     }
+
+    if (user.blocked === true) {
+      return res.status(403).json({
+        message: "Your account is blocked. Contact admin."
+      });
+    }
+
     const doesPasswordMatch = await bcrypt.compare(
       data.password,
       user.password
@@ -163,19 +170,19 @@ export async function deleteUser(req, res) {
 //   }
 // }
 
-// export async function UserBlock(req, res) {
-//   try {
-//     const { id } = req.params;
-//     const { blocked } = req.body;
+export async function UserBlock(req, res) {
+  try {
+    const { id } = req.params;
+    const { blocked } = req.body;
 
-//     const user = await Auth.findByIdAndUpdate(
-//       id,
-//       { blocked },
-//       { new: true }
-//     );
+    const user = await Auth.findByIdAndUpdate(
+      id,
+      { blocked },
+      { new: true }
+    );
 
-//     res.status(200).json(user);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
