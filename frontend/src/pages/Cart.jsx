@@ -131,7 +131,7 @@ const Cart = () => {
                              flex flex-col sm:flex-row gap-4"
                 >
                   <img
-                    src={`${instance.defaults.baseURL}/${item.productId?.image}`}
+                    src={item.productId.image}
                     alt={item.productId?.name}
                     className="w-24 h-24 object-contain bg-slate-100 rounded mx-auto sm:mx-0"
                   />

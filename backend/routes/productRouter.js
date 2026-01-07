@@ -24,12 +24,10 @@ const upload = multer({ storage });
 
 const productRouter = Router();
 
-/* ===== PUBLIC ===== */
 productRouter.get("/", getProduct);
 productRouter.get("/:slug", getSingleProduct);
 productRouter.get("/checkslug/:slug", checkSlug);
 
-/* ===== ADMIN ===== */
 productRouter.post("/", upload.single("image"), addProduct);
 productRouter.put("/:slug", upload.single("image"), updateProduct);
 productRouter.delete("/:slug", deleteProduct);

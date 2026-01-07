@@ -12,7 +12,7 @@ function ProductCard({ product, slug }) {
 
       {/* IMAGE */}
       <Link to={`/product/${slug}`} className="block relative h-56 ">
-        
+
         {/* IMAGE LOADER */}
         {imgLoading && (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -21,12 +21,11 @@ function ProductCard({ product, slug }) {
         )}
 
         <img
-          src={`${instance.defaults.baseURL}/${product.image}`}
+          src={product.image}
           alt={product.name}
           onLoad={() => setImgLoading(false)}
-          className={`w-full h-56 object-contain transition-transform duration-300 group-hover:scale-105 ${
-            imgLoading ? "opacity-0" : "opacity-100"
-          }`}
+          className={`w-full h-56 object-contain transition-transform duration-300 group-hover:scale-105 ${imgLoading ? "opacity-0" : "opacity-100"
+            }`}
         />
       </Link>
 

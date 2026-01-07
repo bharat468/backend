@@ -1,12 +1,15 @@
 import Product from "../models/productmodel.js";
+import cloudinary from "../middlewares/cloudinary.js"
 
 /* ================= ADD PRODUCT ================= */
 export async function addProduct(req, res) {
   try {
     const newRecord = req.body;
+    // console.log(req.file);
 
     if (req.file) {
-      newRecord.image = req.file.path;
+      const result = await cloudinary.uploader.upload(req.file.path, { folder: "product", })
+      newRecord.image = result.secure_url
     }
 
     const newProduct = new Product(newRecord);
@@ -14,6 +17,7 @@ export async function addProduct(req, res) {
 
     return res.status(201).json(newProduct);
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ message: error.message });
   }
 }
@@ -61,7 +65,8 @@ export async function updateProduct(req, res) {
     const updatedData = req.body;
 
     if (req.file) {
-      updatedData.image = req.file.path;
+      const result = await cloudinary.uploader.upload(req.file.path, { folder: "product", })
+      updatedData.image = result.secure_url
     }
 
     const updatedProduct = await Product.findOneAndUpdate(

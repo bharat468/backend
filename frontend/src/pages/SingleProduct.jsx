@@ -118,7 +118,7 @@ const SingleProduct = () => {
         {/* IMAGE */}
         <div className="bg-white rounded-2xl shadow p-6 flex items-center justify-center">
           <img
-            src={`${instance.defaults.baseURL}/${product.image}`}
+            src={product.image}
             alt={product.name}
             className="max-h-96 object-contain"
           />
