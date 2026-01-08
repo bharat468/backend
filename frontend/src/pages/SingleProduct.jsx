@@ -87,14 +87,12 @@ const SingleProduct = () => {
     return <p className="text-center py-20">Product not found</p>;
   }
 
-  // ⭐ Correct image URL handling (Cloudinary + Render)
   const imgSrc = product.image?.startsWith("http")
     ? product.image
     : `${import.meta.env.VITE_BASEURL}${product.image?.startsWith("/") ? "" : "/"}${product.image}`;
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* 🔝 TOP BAR */}
       <div className="flex items-center gap-4 mx-6 py-5 mb-6">
         <button
           onClick={handleBack}
@@ -107,7 +105,6 @@ const SingleProduct = () => {
 
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 gap-12">
 
-        {/* IMAGE */}
         <div className="bg-white rounded-2xl shadow p-6 flex items-center justify-center">
           <img
             src={imgSrc}
@@ -116,7 +113,6 @@ const SingleProduct = () => {
           />
         </div>
 
-        {/* DETAILS */}
         <div className="space-y-4">
           <h1 className="text-3xl font-bold">{product.name}</h1>
 

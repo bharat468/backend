@@ -13,7 +13,6 @@ const router = express.Router();
 router.post("/create", createCoupon);
 router.post("/verify", verifyCoupon);
 
-// ✅ NEW ROUTES
 router.get("/", getAllCoupons);
 router.get("/:id", getSingleCoupon);
 router.put("/:id", updateCoupon);

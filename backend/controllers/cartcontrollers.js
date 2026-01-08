@@ -1,6 +1,5 @@
 import Cart from "../models/cartmodel.js";
 
-// ➕ ADD ITEM TO CART
 export async function addToCart(req, res) {
   try {
     if (!req.userId) return res.status(401).json({ message: "Unauthorized" });
@@ -26,7 +25,6 @@ export async function addToCart(req, res) {
   }
 }
 
-// 🧾 GET CART for logged user
 export async function getCart(req, res) {
   try {
     const cart = await Cart.find({ userId: req.userId })
@@ -38,7 +36,6 @@ export async function getCart(req, res) {
   }
 }
 
-// 🔁 UPDATE QUANTITY
 export async function updateCartQty(req, res) {
   try {
     const { cartId, quantity } = req.body;
@@ -61,7 +58,6 @@ export async function updateCartQty(req, res) {
   }
 }
 
-// ❌ REMOVE ITEM
 export async function removeCartItem(req, res) {
   try {
     const { cartId } = req.params;

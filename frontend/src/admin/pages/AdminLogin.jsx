@@ -51,10 +51,8 @@ function AdminLogin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
 
-      {/* CARD */}
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
 
-        {/* TITLE */}
         <h2 className="text-center text-3xl font-bold text-slate-800">
           Admin Login
         </h2>
@@ -62,10 +60,8 @@ function AdminLogin() {
           Secure admin access
         </p>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* EMAIL */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">
               Email
@@ -83,7 +79,6 @@ function AdminLogin() {
             />
           </div>
 
-          {/* PASSWORD */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">
               Password
@@ -102,7 +97,6 @@ function AdminLogin() {
                 required
               />
 
-              {/* SHOW / HIDE */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -114,7 +108,6 @@ function AdminLogin() {
             </div>
           </div>
 
-          {/* BUTTON */}
           <button
             type="submit"
             disabled={loading}

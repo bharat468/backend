@@ -31,18 +31,15 @@ function Login() {
       if (res.status === 200) {
         checkIsLoggedIn();
 
-        // ✅ READ nextPage
         const params = new URLSearchParams(window.location.search);
         const nextPage = params.get("nextPage");
 
-        // ✅ Go back to same product page
         navigate(nextPage || "/");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Invalid email or password");
     }
   }
-
 
   async function handleGoogleSuccess(res) {
     try {
@@ -63,10 +60,8 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
 
-      {/* CARD */}
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
 
-        {/* TITLE */}
         <h2 className="text-center text-3xl font-bold text-slate-800">
           Welcome Back
         </h2>
@@ -74,10 +69,8 @@ function Login() {
           Login to continue shopping
         </p>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* EMAIL */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">
               Email
@@ -95,7 +88,6 @@ function Login() {
             />
           </div>
 
-          {/* PASSWORD */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">
               Password
@@ -124,7 +116,6 @@ function Login() {
             </div>
           </div>
 
-          {/* REGISTER */}
           <Link
             to="/register"
             className="block text-center text-sm font-medium text-slate-700 hover:underline"
@@ -132,7 +123,6 @@ function Login() {
             Don’t have an account? Register
           </Link>
 
-          {/* BUTTON */}
           <button
             type="submit"
             disabled={loading}
@@ -146,14 +136,12 @@ function Login() {
           </button>
         </form>
 
-        {/* DIVIDER */}
         <div className="flex items-center gap-4 my-8">
           <div className="flex-1 h-px bg-slate-300"></div>
           <span className="text-slate-400 text-sm">OR</span>
           <div className="flex-1 h-px bg-slate-300"></div>
         </div>
 
-        {/* GOOGLE */}
         <div className="flex justify-center">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}

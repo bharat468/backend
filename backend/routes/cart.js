@@ -9,9 +9,9 @@ import {
 
 const cartRouter = Router();
 
-cartRouter.get("/", checkAuth, getCart);          // ✔ Fetch cart
-cartRouter.post("/add", checkAuth, addToCart);    // ✔ Add item
-cartRouter.put("/update", checkAuth, updateCartQty); // ✔ Update qty
-cartRouter.delete("/remove/:cartId", checkAuth, removeCartItem); // ✔ Remove
+cartRouter.get("/", checkAuth, getCart);         
+cartRouter.post("/add", checkAuth, addToCart);   
+cartRouter.put("/update", checkAuth, updateCartQty); 
+cartRouter.delete("/remove/:cartId", checkAuth, removeCartItem); 
 
 export default cartRouter;

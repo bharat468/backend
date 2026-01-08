@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 
-/* ================= USER PAGES ================= */
 import First from "./pages/First";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -8,7 +7,6 @@ import Register from "./pages/Register";
 import SingleProduct from "./pages/SingleProduct";
 import Cart from "./pages/Cart";
 
-/* ================= ADMIN PAGES ================= */
 import AdminLogin from "./admin/pages/AdminLogin";
 import AdminHome from "./admin/pages/AdminHome";
 import AddProduct from "./admin/pages/AddProduct";
@@ -19,18 +17,14 @@ import EditProduct from "./admin/pages/EditProduct";
 import CouponList from "./admin/pages/CouponList";
 import EditCoupon from "./admin/pages/EditCoupon";
 
-/* ================= ADMIN COMPONENTS ================= */
 import AdminLayout from "./admin/components/AdminLayout";
 import ProtectedRouters from "./admin/components/ProtectedRouters";
 
-/* ================= CONTEXT ================= */
 import AuthProvider from "./contexts/AuthProvider";
 import { CartProvider } from "./contexts/CartContext";
 import About from "./pages/About";
 
-/* ================= ROUTER ================= */
 const router = createBrowserRouter([
-  /* ========== USER SIDE ========== */
   {
     path: "/",
     element: (
@@ -39,20 +33,39 @@ const router = createBrowserRouter([
       </CartProvider>
     ),
     children: [
-      { index: true, element: <Home /> },
-      { path: "login", element: <Login /> },
-      { path: "register", element: <Register /> },
-      { path: "product/:slug", element: <SingleProduct /> },
-      { path: "cart", element: <Cart /> },
-      { path: "about", element: <About/> },
+      {
+        index: true,
+        element: <Home />
+      },
+      {
+        path: "login",
+        element: <Login />
+      },
+      {
+        path: "register",
+        element: <Register />
+      },
+      {
+        path: "product/:slug",
+        element: <SingleProduct />
+      },
+      {
+        path: "cart",
+        element: <Cart />
+      },
+      {
+        path: "about",
+        element: <About />
+      },
 
     ],
   },
 
-  /* ========== ADMIN LOGIN ========== */
-  { path: "/admin/login", element: <AdminLogin /> },
+  {
+    path: "/admin/login",
+    element: <AdminLogin />
+  },
 
-  /* ========== ADMIN PROTECTED ========== */
   {
     path: "/admin",
     element: (
@@ -61,15 +74,42 @@ const router = createBrowserRouter([
       </ProtectedRouters>
     ),
     children: [
-      { index: true, element: <Navigate to="home" replace /> },
-      { path: "home", element: <AdminHome /> },
-      { path: "product/add", element: <AddProduct /> },
-      { path: "product/edit/:slug", element: <EditProduct /> },
-      { path: "products", element: <ProductList /> },
-      { path: "users", element: <UserList /> },
-      { path: "coupon/create", element: <AdminCreateCoupon /> },
-      { path: "coupons", element: <CouponList /> },
-      { path: "coupon/edit/:id", element: <EditCoupon /> },
+      {
+        index: true,
+        element: <Navigate to="home" replace />
+      },
+      {
+        path: "home",
+        element: <AdminHome />
+      },
+      {
+        path: "product/add",
+        element: <AddProduct />
+      },
+      {
+        path: "product/edit/:slug",
+        element: <EditProduct />
+      },
+      {
+        path: "products",
+        element: <ProductList />
+      },
+      {
+        path: "users",
+        element: <UserList />
+      },
+      {
+        path: "coupon/create",
+        element: <AdminCreateCoupon />
+      },
+      {
+        path: "coupons",
+        element: <CouponList />
+      },
+      {
+        path: "coupon/edit/:id",
+        element: <EditCoupon />
+      },
     ],
   },
 ]);

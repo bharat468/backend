@@ -18,7 +18,7 @@ export async function loginAdmin(req, res) {
 
         const doesPasswordMatch = await bcrypt.compare(data.password, user.password);
         if (!doesPasswordMatch)
-            return res.status(404).json({ message: "Invalid Credentials" });
+            return res.status(404).json({ message: "Invalid password" });
 
         const admin_token = jwt.sign(
             { id: user._id, role: user.role },
@@ -26,11 +26,10 @@ export async function loginAdmin(req, res) {
             { expiresIn: "1h" }
         );
 
-        // 🔹 FIXED COOKIE SETTINGS (sameSite + secure)
         res.cookie("admin_token", admin_token, {
             httpOnly: true,
-            secure: true,       // <= IMPORTANT
-            sameSite: process.env.sameSite ? process.env.sameSite : "lax",   // <= IMPORTANT (for cross-site cookies)
+            secure: true,
+            sameSite: process.env.sameSite ? process.env.sameSite : "lax",
             maxAge: 3600000
         });
 

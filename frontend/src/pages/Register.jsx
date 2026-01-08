@@ -32,7 +32,6 @@ function Register() {
     setData({ ...data, [name]: value });
   }
 
-  // 📩 SEND OTP
   async function sendOTP() {
     try {
       if (!data.email || !data.username || !data.phone) {
@@ -61,7 +60,6 @@ function Register() {
     }
   }
 
-  // 🔐 VERIFY OTP
   async function verifyOTP() {
     try {
       await instance.post("/user/verify-otp", {
@@ -76,7 +74,6 @@ function Register() {
     }
   }
 
-  // 📝 FINAL REGISTER
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -157,7 +154,6 @@ function Register() {
             required
           />
 
-          {/* EMAIL + SEND OTP */}
           <div className="flex gap-2">
             <input
               type="email"
@@ -180,7 +176,6 @@ function Register() {
             </button>
           </div>
 
-          {/* OTP FIELD */}
           {otpSent && (
             <div className="flex gap-2">
               <input
@@ -200,7 +195,6 @@ function Register() {
             </div>
           )}
 
-          {/* PASSWORD */}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}

@@ -7,14 +7,10 @@ import { sendWelcomeEmail } from "../utils/sendEmail.js";
 
 sgMail.setApiKey(process.env.MY_SENDGRID_API_KEY);
 
-// =========================
-//  SEND OTP CONTROLLER
-// =========================
 export async function sendOtp(req, res) {
   try {
     const { email, username, phone } = req.body;
 
-    // 🔹 Duplicate checks
     if (await Auth.findOne({ email }))
       return res.status(400).json({ message: "Email already registered" });
 
@@ -24,9 +20,10 @@ export async function sendOtp(req, res) {
     if (await Auth.findOne({ phone }))
       return res.status(400).json({ message: "Phone already registered" });
 
-    // 🔹 Generate 6 digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
+    console.log(otp)
     const otpHash = await bcrypt.hash(otp.toString(), 10);
+    // console.log(otpHash)
 
     // 🔹 Save OTP in DB (replace old one)
     await OTP.findOneAndUpdate(
@@ -35,7 +32,6 @@ export async function sendOtp(req, res) {
       { upsert: true }
     );
 
-    // 🔹 Send OTP email
     await sgMail.send({
       to: email,
       from: process.env.MY_SENDGRID_EMAIL,
@@ -50,9 +46,7 @@ export async function sendOtp(req, res) {
   }
 }
 
-// =========================
-//  VERIFY OTP CONTROLLER
-// =========================
+
 export async function verifyOtp(req, res) {
   try {
     const { email, otp } = req.body;
@@ -77,9 +71,7 @@ export async function verifyOtp(req, res) {
   }
 }
 
-// =========================
-//  REGISTER USER CONTROLLER
-// =========================
+
 export async function registerUser(req, res) {
   try {
     const { name, email, phone, username, password } = req.body;
@@ -107,9 +99,7 @@ export async function registerUser(req, res) {
   }
 }
 
-// =========================
-//  LOGIN USER
-// =========================
+
 export async function loginUser(req, res) {
   try {
     const { email, password } = req.body;
@@ -125,7 +115,7 @@ export async function loginUser(req, res) {
 
     const doesPasswordMatch = await bcrypt.compare(password, user.password);
     if (!doesPasswordMatch)
-      return res.status(400).json({ message: "Invalid Credentials" });
+      return res.status(400).json({ message: "Invalid password" });
 
     const auth_token = jwt.sign(
       { id: user._id, role: user.role },
@@ -147,9 +137,7 @@ export async function loginUser(req, res) {
   }
 }
 
-// =========================
-//  LOGOUT USER
-// =========================
+
 export async function logoutUser(req, res) {
   try {
     res.clearCookie("auth_token", {
@@ -163,9 +151,6 @@ export async function logoutUser(req, res) {
   }
 }
 
-// =========================
-//  GET ALL USERS
-// =========================
 export async function getUsers(req, res) {
   try {
     const users = await Auth.find();
@@ -178,9 +163,6 @@ export async function getUsers(req, res) {
   }
 }
 
-// =========================
-//  UPDATE USER (ADMIN)
-// =========================
 export async function updateUser(req, res) {
   try {
     const { id } = req.params;
@@ -200,9 +182,7 @@ export async function updateUser(req, res) {
   }
 }
 
-// =========================
-//  DELETE USER (ADMIN)
-// =========================
+
 export async function deleteUser(req, res) {
   try {
     const { id } = req.params;
@@ -221,9 +201,6 @@ export async function deleteUser(req, res) {
   }
 }
 
-// =========================
-//  BLOCK USER (ADMIN)
-// =========================
 export async function UserBlock(req, res) {
   try {
     const { id } = req.params;

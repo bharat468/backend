@@ -14,10 +14,8 @@ function ProductCard({ product, slug }) {
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group">
 
-      {/* IMAGE */}
       <Link to={`/product/${slug}`} className="block relative h-56">
 
-        {/* IMAGE LOADER */}
         {imgLoading && (
           <div className="absolute inset-0 flex items-center justify-center">
             <FaImage className="text-3xl text-teal-500 animate-pulse" />
@@ -35,17 +33,14 @@ function ProductCard({ product, slug }) {
         />
       </Link>
 
-      {/* CONTENT */}
       <div className="p-4 space-y-2">
 
-        {/* PRODUCT NAME */}
         <Link to={`/product/${slug}`}>
           <h3 className="text-lg font-semibold text-slate-800 line-clamp-1 hover:text-teal-600 transition">
             {product.name}
           </h3>
         </Link>
 
-        {/* PRICE */}
         <div className="flex items-center gap-2 text-slate-700">
           <PiCurrencyInrLight className="text-xl" />
 

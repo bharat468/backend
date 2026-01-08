@@ -22,7 +22,6 @@ export const createCoupon = async (req, res) => {
   }
 };
 
-/* ================= GET ALL ================= */
 export const getAllCoupons = async (req, res) => {
   try {
     const coupons = await Coupon.find().sort({ createdAt: -1 });
@@ -32,7 +31,6 @@ export const getAllCoupons = async (req, res) => {
   }
 };
 
-/* ================= GET SINGLE ================= */
 export const getSingleCoupon = async (req, res) => {
   try {
     const coupon = await Coupon.findById(req.params.id);
@@ -45,7 +43,7 @@ export const getSingleCoupon = async (req, res) => {
   }
 };
 
-/* ================= UPDATE ================= */
+
 export const updateCoupon = async (req, res) => {
   try {
     const updated = await Coupon.findByIdAndUpdate(
@@ -60,7 +58,7 @@ export const updateCoupon = async (req, res) => {
   }
 };
 
-/* ================= DELETE ================= */
+
 export const deleteCoupon = async (req, res) => {
   try {
     await Coupon.findByIdAndDelete(req.params.id);
@@ -70,7 +68,7 @@ export const deleteCoupon = async (req, res) => {
   }
 };
 
-/* ================= VERIFY ================= */
+
 export const verifyCoupon = async (req, res) => {
   try {
     const { code } = req.body;

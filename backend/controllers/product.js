@@ -22,7 +22,6 @@ export async function addProduct(req, res) {
   }
 }
 
-/* ================= GET SINGLE PRODUCT (BY SLUG) ================= */
 export async function getSingleProduct(req, res) {
   try {
     const { slug } = req.params;
@@ -43,7 +42,6 @@ export async function getSingleProduct(req, res) {
   }
 }
 
-/* ================= GET ALL PRODUCTS ================= */
 export async function getProduct(req, res) {
   try {
     const products = await Product.find();
@@ -53,7 +51,6 @@ export async function getProduct(req, res) {
   }
 }
 
-/* ================= UPDATE PRODUCT (BY SLUG) ================= */
 export async function updateProduct(req, res) {
   try {
     const { slug } = req.params;
@@ -88,7 +85,6 @@ export async function updateProduct(req, res) {
   }
 }
 
-/* ================= DELETE PRODUCT (BY SLUG) ================= */
 export async function deleteProduct(req, res) {
   try {
     const { slug } = req.params;
@@ -109,7 +105,6 @@ export async function deleteProduct(req, res) {
   }
 }
 
-/* ================= CHECK SLUG ================= */
 export async function checkSlug(req, res) {
   try {
     const { slug } = req.params;

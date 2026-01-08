@@ -3,7 +3,7 @@ import ProductCard from "../components/ProductCard";
 import instance from "../axiosConfig";
 import { FaShoppingBag } from "react-icons/fa";
 
-const ITEMS_PER_LOAD = 8;
+const count = 8;
 
 const Product = () => {
   const [allProducts, setAllProducts] = useState([]);
@@ -17,7 +17,6 @@ const Product = () => {
     fetchAllProducts();
   }, []);
 
-  /* ================= FETCH ALL PRODUCTS ================= */
   async function fetchAllProducts() {
     try {
       setLoading(true);
@@ -25,8 +24,7 @@ const Product = () => {
 
       setAllProducts(res.data);
 
-      // first random load
-      const firstBatch = getRandomProducts(res.data, ITEMS_PER_LOAD);
+      const firstBatch = getRandomProducts(res.data, count);
       setVisibleProducts(firstBatch);
     } catch (err) {
       console.log(err);
@@ -35,26 +33,23 @@ const Product = () => {
     }
   }
 
-  /* ================= RANDOM PICK ================= */
-  function getRandomProducts(arr, count) {
+  function getRandomProducts(arr, count1) {
     const shuffled = [...arr].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
+    return shuffled.slice(0, count1);
   }
 
-  /* ================= LOAD MORE ================= */
   function loadMoreProducts() {
     if (loadingMore) return;
 
     setLoadingMore(true);
 
     setTimeout(() => {
-      const more = getRandomProducts(allProducts, ITEMS_PER_LOAD);
+      const more = getRandomProducts(allProducts, count);
       setVisibleProducts(prev => [...prev, ...more]);
       setLoadingMore(false);
-    }, 600); // smooth delay
+    }, 400);
   }
 
-  /* ================= OBSERVER ================= */
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -74,7 +69,6 @@ const Product = () => {
     <div className="bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-10">
 
-        {/* PAGE HEADING */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-slate-800">
             Best Products For You
@@ -84,7 +78,6 @@ const Product = () => {
           </p>
         </div>
 
-        {/* FIRST LOAD LOADER */}
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
             <div className="relative">
@@ -97,7 +90,6 @@ const Product = () => {
           </div>
         ) : (
           <>
-            {/* PRODUCTS GRID */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {visibleProducts.map((product, index) => (
                 <ProductCard
@@ -108,14 +100,12 @@ const Product = () => {
               ))}
             </div>
 
-            {/* LOAD MORE LOADER */}
             {loadingMore && (
               <div className="flex justify-center py-10">
                 <FaShoppingBag className="text-4xl text-teal-600 animate-bounce" />
               </div>
             )}
 
-            {/* OBSERVER TARGET */}
             <div ref={observerRef} className="h-10"></div>
           </>
         )}
