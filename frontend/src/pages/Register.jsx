@@ -18,17 +18,69 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [verified, setVerified] = useState(false);
+  const [timer, setTimer] = useState(0);
+
   function handleChange(e) {
     const { name, value } = e.target;
+
     if (name === "name" && !/^[A-Za-z\s]*$/.test(value)) return;
-    // ✅ phone → only numbers
     if (name === "phone" && !/^\d*$/.test(value)) return;
 
     setData({ ...data, [name]: value });
   }
 
+  // 📩 SEND OTP
+  async function sendOTP() {
+    try {
+      if (!data.email || !data.username || !data.phone) {
+        return toast.warning("Fill email, phone & username first");
+      }
+
+      await instance.post("/user/send-otp", {
+        email: data.email,
+        username: data.username,
+        phone: data.phone,
+      });
+
+      toast.success("OTP sent ✉️");
+      setOtpSent(true);
+
+      setTimer(30);
+      const interval = setInterval(() => {
+        setTimer((t) => {
+          if (t <= 1) clearInterval(interval);
+          return t - 1;
+        });
+      }, 1000);
+
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to send OTP");
+    }
+  }
+
+  // 🔐 VERIFY OTP
+  async function verifyOTP() {
+    try {
+      await instance.post("/user/verify-otp", {
+        email: data.email,
+        otp,
+      });
+
+      setVerified(true);
+      toast.success("Verified 🎉");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Wrong OTP ❌");
+    }
+  }
+
+  // 📝 FINAL REGISTER
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (!verified) return toast.warning("Please verify OTP first ❌");
 
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
@@ -39,23 +91,15 @@ function Register() {
       !data.username ||
       !data.email ||
       !data.password
-    ) {
-      toast.warning("Please fill all fields");
-      return;
-    }
+    ) return toast.warning("Fill all fields");
 
-    if (data.phone.length !== 10) {
-      toast.warning("Enter a valid 10 digit phone number");
-      return;
-    }
+    if (data.phone.length !== 10)
+      return toast.warning("Enter valid 10-digit phone");
 
-    // 🔐 PASSWORD VALIDATION
-    if (!passwordRegex.test(data.password)) {
-      toast.warning(
-        "Password must be at least 8 characters and include 1 capital letter, 1 number, and 1 special character"
+    if (!passwordRegex.test(data.password))
+      return toast.warning(
+        "Password must include 1 capital letter, 1 number, 1 special character"
       );
-      return;
-    }
 
     try {
       setLoading(true);
@@ -63,9 +107,7 @@ function Register() {
       toast.success("Registration successful 🎉");
       navigate("/login");
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Registration failed ❌"
-      );
+      toast.error(error.response?.data?.message || "Registration failed ❌");
     } finally {
       setLoading(false);
     }
@@ -73,7 +115,6 @@ function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
 
         <h2 className="text-center text-3xl font-bold text-slate-800">
@@ -85,118 +126,113 @@ function Register() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
 
-          {/* NAME */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">
-              Full Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={data.name}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100
-              focus:outline-none focus:ring-2 focus:ring-slate-800"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={data.name}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100 focus:outline-none"
+            required
+          />
 
-          {/* PHONE */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              name="phone"
-              maxLength={10}
-              value={data.phone}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100
-              focus:outline-none focus:ring-2 focus:ring-slate-800"
-              required
-            />
-          </div>
+          <input
+            type="tel"
+            name="phone"
+            maxLength={10}
+            placeholder="Phone Number"
+            value={data.phone}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100 focus:outline-none"
+            required
+          />
 
-          {/* USERNAME */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              value={data.username}
-              onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100
-              focus:outline-none focus:ring-2 focus:ring-slate-800"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={data.username}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100 focus:outline-none"
+            required
+          />
 
-          {/* EMAIL */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">
-              Email
-            </label>
+          {/* EMAIL + SEND OTP */}
+          <div className="flex gap-2">
             <input
               type="email"
               name="email"
+              placeholder="Email"
               value={data.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 bg-slate-100
-              focus:outline-none focus:ring-2 focus:ring-slate-800"
+              className="flex-1 px-4 py-3 rounded-lg border border-slate-300 bg-slate-100 focus:outline-none"
               required
             />
+            <button
+              type="button"
+              disabled={timer > 0}
+              onClick={sendOTP}
+              className={`px-3 rounded-lg text-white bg-blue-600 ${
+                timer > 0 ? "opacity-60 cursor-not-allowed" : "hover:bg-blue-700"
+              }`}
+            >
+              {timer > 0 ? `Wait ${timer}s` : "OTP"}
+            </button>
           </div>
 
-          {/* PASSWORD */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1">
-              Password
-            </label>
-            <div className="relative">
+          {/* OTP FIELD */}
+          {otpSent && (
+            <div className="flex gap-2">
               <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={data.password}
-                onChange={handleChange}
-                className="w-full px-4 py-3 pr-12 rounded-lg border border-slate-300 bg-slate-100
-                focus:outline-none focus:ring-2 focus:ring-slate-800"
-                required
+                type="text"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="flex-1 px-4 py-3 rounded-lg border border-slate-300 bg-slate-100 focus:outline-none"
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute top-1/2 right-4 -translate-y-1/2 text-slate-500"
+                onClick={verifyOTP}
+                className="px-3 rounded-lg text-white bg-green-600 hover:bg-green-700"
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                Verify
               </button>
             </div>
+          )}
 
-            {/* PASSWORD HINT */}
-            <p className="text-xs text-slate-500 mt-1">
-              Must contain 1 capital letter, 1 number, 1 special character & minimum 8 characters
-            </p>
+          {/* PASSWORD */}
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={data.password}
+              onChange={handleChange}
+              className="w-full px-4 py-3 pr-12 rounded-lg border border-slate-300 bg-slate-100 focus:outline-none"
+              required
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute top-3 right-4 cursor-pointer text-slate-500"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
 
-          <Link
-            to="/login"
-            className="block text-center text-sm text-slate-700 hover:underline"
-          >
+          <Link to="/login" className="block text-center text-sm text-slate-700 hover:underline">
             Already have an account? Login
           </Link>
 
           <button
             type="submit"
-            disabled={loading}
-            className={`w-full py-3 rounded-lg text-white font-semibold
-              bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900
-              ${loading ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5"}
-            `}
+            disabled={!verified || loading}
+            className={`w-full py-3 rounded-lg text-white font-semibold ${
+              verified ? "bg-slate-900" : "bg-slate-400 cursor-not-allowed"
+            }`}
           >
-            {loading ? "Creating account..." : "Register"}
+            {loading ? "Creating..." : "Register"}
           </button>
+
         </form>
       </div>
     </div>

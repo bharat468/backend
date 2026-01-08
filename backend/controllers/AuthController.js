@@ -1,189 +1,237 @@
-import mongoose from "mongoose";
 import Auth from "../models/Authmodel.js";
+import OTP from "../models/OtpModel.js";
 import bcrypt from "bcrypt";
-import "dotenv/config.js";
 import jwt from "jsonwebtoken";
+import sgMail from "@sendgrid/mail";
 import { sendWelcomeEmail } from "../utils/sendEmail.js";
 
+sgMail.setApiKey(process.env.MY_SENDGRID_API_KEY);
+
+// =========================
+//  SEND OTP CONTROLLER
+// =========================
+export async function sendOtp(req, res) {
+  try {
+    const { email, username, phone } = req.body;
+
+    // 🔹 Duplicate checks
+    if (await Auth.findOne({ email }))
+      return res.status(400).json({ message: "Email already registered" });
+
+    if (await Auth.findOne({ username }))
+      return res.status(400).json({ message: "Username already taken" });
+
+    if (await Auth.findOne({ phone }))
+      return res.status(400).json({ message: "Phone already registered" });
+
+    // 🔹 Generate 6 digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otpHash = await bcrypt.hash(otp.toString(), 10);
+
+    // 🔹 Save OTP in DB (replace old one)
+    await OTP.findOneAndUpdate(
+      { email },
+      { email, otpHash, expiresAt: Date.now() + 5 * 60 * 1000 },
+      { upsert: true }
+    );
+
+    // 🔹 Send OTP email
+    await sgMail.send({
+      to: email,
+      from: process.env.MY_SENDGRID_EMAIL,
+      subject: "Verify your email",
+      html: `<h2>Your OTP is: <b>${otp}</b></h2><p>Valid for 5 minutes.</p>`
+    });
+
+    res.json({ message: "OTP sent successfully" });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// =========================
+//  VERIFY OTP CONTROLLER
+// =========================
+export async function verifyOtp(req, res) {
+  try {
+    const { email, otp } = req.body;
+
+    const record = await OTP.findOne({ email });
+    if (!record)
+      return res.status(400).json({ message: "Send OTP first" });
+
+    if (Date.now() > record.expiresAt)
+      return res.status(400).json({ message: "OTP expired" });
+
+    const match = await bcrypt.compare(otp.toString(), record.otpHash);
+    if (!match)
+      return res.status(400).json({ message: "Incorrect OTP" });
+
+    // 🔥 Delete OTP after success
+    await OTP.deleteOne({ email });
+
+    res.json({ verified: true, message: "Email verified successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to verify OTP" });
+  }
+}
+
+// =========================
+//  REGISTER USER CONTROLLER
+// =========================
 export async function registerUser(req, res) {
   try {
-    const data = req.body;
+    const { name, email, phone, username, password } = req.body;
 
-    const userExists = await Auth.findOne({ username: data.username });
-    if (userExists) {
-      return res.status(400).json({ message: "Username already exists" });
-    }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const emailExits = await Auth.findOne({ email: data.email });
-    if (emailExits) {
-      return res.status(400).json({ message: "email already exists" });
-    }
+    const newUser = await Auth.create({
+      name,
+      email,
+      phone,
+      username,
+      password: hashedPassword,
+      role: "user"
+    });
 
-    const phoneExits = await Auth.findOne({ phone: data.phone });
-    if (phoneExits) {
-      return res.status(400).json({ message: "phone already exists" });
-    }
+    await sendWelcomeEmail(email, name);
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    data.password = hashedPassword;
-    data.role = "user";
+    res.status(201).json({
+      message: "User registered successfully",
+      user: newUser
+    });
 
-    const newUser = new Auth(data);
-    await newUser.save();
-    await sendWelcomeEmail(data.email, data.name)
-    res
-      .status(201)
-      .json({ message: "User registered successfully", user: newUser });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
-export async function getUsers(req, res) {
-  try {
-    const users = await Auth.find();
-    if (!users || users.length === 0) {
-      return res.status(404).json({ message: "No users found" });
-    } else {
-      return res.status(200).json({ users: users });
-    }
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server Error", error: error.message });
-  }
-}
+
+// =========================
+//  LOGIN USER
+// =========================
 export async function loginUser(req, res) {
   try {
-    const data = req.body;
-    const user = await Auth.findOne({ email: data.email });
-    if (!user) {
-      return res.status(404).json({ message: "email not found" });
-    }
+    const { email, password } = req.body;
 
-    if (user.blocked === true) {
+    const user = await Auth.findOne({ email });
+    if (!user)
+      return res.status(404).json({ message: "Email not found" });
+
+    if (user.blocked)
       return res.status(403).json({
         message: "Your account is blocked. Contact admin."
       });
-    }
 
-    const doesPasswordMatch = await bcrypt.compare(
-      data.password,
-      user.password
-
-    );
-    if (user.role !== "user")
-      return res.status(404).json({ message: "you are not a user" });
-
-    if (!doesPasswordMatch) {
-      return res.status(404).json({ message: "Invalid Credentials" });
-    }
+    const doesPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!doesPasswordMatch)
+      return res.status(400).json({ message: "Invalid Credentials" });
 
     const auth_token = jwt.sign(
-      {
-        id: user._id,
-        role: user.role,
-      },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
     res.cookie("auth_token", auth_token, {
       httpOnly: true,
       secure: true,
-      sameSite: process.env.sameSite ? process.env.sameSite : "lax",
-      maxAge: 3600 * 1000,
+      sameSite: process.env.sameSite || "lax",
+      maxAge: 3600 * 1000
     });
 
+    res.status(200).json({ message: "Login Successful", user });
 
-    return res.status(200).json({ message: "Login Successful", user: user });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
+
+// =========================
+//  LOGOUT USER
+// =========================
 export async function logoutUser(req, res) {
   try {
     res.clearCookie("auth_token", {
       httpOnly: true,
-      secure: true,   // 🔥 SAME AS LOGIN
-      sameSite: process.env.sameSite ? process.env.sameSite : "lax", // 🔥 SAME AS LOGIN
+      secure: true,
+      sameSite: process.env.sameSite || "lax",
     });
-
-    return res.status(200).json({ message: "User logged out successfully" });
+    res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
 
+// =========================
+//  GET ALL USERS
+// =========================
+export async function getUsers(req, res) {
+  try {
+    const users = await Auth.find();
+    if (!users.length)
+      return res.status(404).json({ message: "No users found" });
+
+    res.status(200).json({ users });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// =========================
+//  UPDATE USER (ADMIN)
+// =========================
 export async function updateUser(req, res) {
   try {
     const { id } = req.params;
     const updatedRecord = req.body;
-    if (!id) {
-      return res.status(400).json({ message: "ID parameter is required" });
-    }
-    if (!updatedRecord) {
-      return res
-        .status(400)
-        .json({ message: "Updated user schema is required" });
-    }
 
     const updatedUser = await Auth.findByIdAndUpdate(id, updatedRecord, {
       new: true,
     });
+
     if (!updatedUser)
-      return res.status(404).json({ message: "Could not update this user" });
-    return res.status(200).json({ message: "User Updated", user: updatedUser });
+      return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ message: "User Updated", user: updatedUser });
+
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
+
+// =========================
+//  DELETE USER (ADMIN)
+// =========================
 export async function deleteUser(req, res) {
   try {
     const { id } = req.params;
-    if (!id)
-      return res.status(400).json({ message: "ID parameter is required" });
 
     const userDeleted = await Auth.findByIdAndDelete(id);
-    if (!userDeleted) {
+    if (!userDeleted)
       return res.status(404).json({ message: "User not found" });
-    }
-    return res
-      .status(200)
-      .json({ message: "User deleted successfully", user: userDeleted });
+
+    res.status(200).json({
+      message: "User deleted successfully",
+      user: userDeleted
+    });
+
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server Error", error: error.message });
+    res.status(500).json({ message: error.message });
   }
 }
 
-
-// export async function UserRole(req, res) {
-//   try {
-//     const { role } = req.query;
-
-//     const users = await Auth.find({ role }).select("-password");
-//     res.status(200).json(users);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// }
-
+// =========================
+//  BLOCK USER (ADMIN)
+// =========================
 export async function UserBlock(req, res) {
   try {
     const { id } = req.params;
     const { blocked } = req.body;
 
-    const user = await Auth.findByIdAndUpdate(
-      id,
-      { blocked },
-      { new: true }
-    );
+    const user = await Auth.findByIdAndUpdate(id, { blocked }, { new: true });
 
-    res.status(200).json(user);
+    res.status(200).json({ message: "Status updated", user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
