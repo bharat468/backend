@@ -3,6 +3,7 @@ import Auth from "../models/Authmodel.js";
 import bcrypt from "bcrypt";
 import "dotenv/config.js";
 import jwt from "jsonwebtoken";
+import { sendWelcomeEmail } from "../utils/sendEmail.js";
 
 export async function registerUser(req, res) {
   try {
@@ -29,6 +30,7 @@ export async function registerUser(req, res) {
 
     const newUser = new Auth(data);
     await newUser.save();
+    await sendWelcomeEmail(data.email, data.name)
     res
       .status(201)
       .json({ message: "User registered successfully", user: newUser });
