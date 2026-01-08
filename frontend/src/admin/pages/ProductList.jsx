@@ -10,11 +10,13 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-/* 🔥 IMAGE URL RESOLVER (MOST IMPORTANT) */
+/* 🔥 IMAGE URL RESOLVER (Render + Cloudinary + Local) */
 const getImageSrc = (image) => {
   if (!image) return "https://via.placeholder.com/60";
-  if (image.startsWith("http")) return image; // already full URL
-  return `${instance.defaults.baseURL}/${image}`; // relative path
+  if (image.startsWith("http")) return image;
+  return `${import.meta.env.VITE_BASEURL}${
+    image.startsWith("/") ? "" : "/"
+  }${image}`;
 };
 
 function ProductList() {

@@ -124,74 +124,80 @@ const Cart = () => {
 
             {/* LEFT - CART ITEMS */}
             <div className="lg:col-span-2 space-y-4">
-              {cart.map(item => (
-                <div
-                  key={item._id}
-                  className="bg-white rounded-xl shadow p-4
-                             flex flex-col sm:flex-row gap-4"
-                >
-                  <img
-                    src={item.productId.image}
-                    alt={item.productId?.name}
-                    className="w-24 h-24 object-contain bg-slate-100 rounded mx-auto sm:mx-0"
-                  />
+              {cart.map(item => {
+                
+                // ⭐ Fix image URL here
+                const imgSrc = item.productId.image?.startsWith("http")
+                  ? item.productId.image
+                  : `${import.meta.env.VITE_BASEURL}${
+                      item.productId.image?.startsWith("/") ? "" : "/"
+                    }${item.productId.image}`;
 
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-sm sm:text-base">
-                      {item.productId?.name}
-                    </h3>
-
-                    <p className="text-teal-600 font-bold mt-1">
-                      ₹{" "}
-                      {item.productId.discountedPrice ??
-                        item.productId.originalPrice}
-                    </p>
-
-                    <div className="flex items-center gap-3 mt-3">
-                      <button
-                        onClick={() =>
-                          updateQty(item._id, item.quantity - 1)
-                        }
-                        className="px-3 py-1 bg-slate-200 rounded"
-                      >
-                        -
-                      </button>
-
-                      <span>{item.quantity}</span>
-
-                      <button
-                        onClick={() =>
-                          updateQty(item._id, item.quantity + 1)
-                        }
-                        className="px-3 py-1 bg-slate-200 rounded"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => removeItem(item._id)}
-                    className="text-red-500 text-sm self-start sm:self-center"
+                return (
+                  <div
+                    key={item._id}
+                    className="bg-white rounded-xl shadow p-4 flex flex-col sm:flex-row gap-4"
                   >
-                    Remove
-                  </button>
-                </div>
-              ))}
+                    <img
+                      src={imgSrc}
+                      alt={item.productId?.name}
+                      className="w-24 h-24 object-contain bg-slate-100 rounded mx-auto sm:mx-0"
+                    />
+
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-sm sm:text-base">
+                        {item.productId?.name}
+                      </h3>
+
+                      <p className="text-teal-600 font-bold mt-1">
+                        ₹{" "}
+                        {item.productId.discountedPrice ??
+                          item.productId.originalPrice}
+                      </p>
+
+                      <div className="flex items-center gap-3 mt-3">
+                        <button
+                          onClick={() =>
+                            updateQty(item._id, item.quantity - 1)
+                          }
+                          className="px-3 py-1 bg-slate-200 rounded"
+                        >
+                          -
+                        </button>
+
+                        <span>{item.quantity}</span>
+
+                        <button
+                          onClick={() =>
+                            updateQty(item._id, item.quantity + 1)
+                          }
+                          className="px-3 py-1 bg-slate-200 rounded"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => removeItem(item._id)}
+                      className="text-red-500 text-sm self-start sm:self-center"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             {/* RIGHT - SUMMARY */}
             <div className="relative">
-              <div className="bg-white rounded-xl shadow p-6 space-y-5
-                              lg:sticky lg:top-[120px]">
+              <div className="bg-white rounded-xl shadow p-6 space-y-5 lg:sticky lg:top-[120px]">
 
-                {/* TOTAL */}
                 <div className="flex justify-between font-medium">
                   <span>Total</span>
                   <span>₹ {totalAmount.toFixed(2)}</span>
                 </div>
 
-                {/* COUPON */}
                 <div className="space-y-3">
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input
@@ -227,7 +233,6 @@ const Cart = () => {
 
                 <hr />
 
-                {/* FINAL */}
                 <div className="flex justify-between font-bold text-lg">
                   <span>Final</span>
                   <span>₹ {finalAmount.toFixed(2)}</span>

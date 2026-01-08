@@ -7,7 +7,6 @@ import { useCart } from "../contexts/CartContext";
 import { toast } from "react-toastify";
 import { FaArrowLeft } from "react-icons/fa";
 
-
 const SingleProduct = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -19,8 +18,6 @@ const SingleProduct = () => {
   const [alreadyInCart, setAlreadyInCart] = useState(false);
   const [btnLoading, setBtnLoading] = useState(false);
 
-
-  // 🔹 Fetch product
   async function getSingleData() {
     try {
       setLoading(true);
@@ -37,23 +34,17 @@ const SingleProduct = () => {
     navigate(-1);
   }
 
-
-  // 🔹 Check cart
   async function checkCart(prodId) {
     try {
       const res = await instance.get("/cart", { withCredentials: true });
-      const found = res.data.find(
-        (item) => item.productId._id === prodId
-      );
+      const found = res.data.find((item) => item.productId._id === prodId);
       if (found) setAlreadyInCart(true);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
-  // 🔹 Add to cart
   async function handleAddToCart() {
-    // ❌ Not logged in → send to login with nextPage
     if (!isLoggedIn) {
       navigate(`/login?nextPage=/product/${slug}`);
       return;
@@ -96,20 +87,21 @@ const SingleProduct = () => {
     return <p className="text-center py-20">Product not found</p>;
   }
 
+  // ⭐ Correct image URL handling (Cloudinary + Render)
+  const imgSrc = product.image?.startsWith("http")
+    ? product.image
+    : `${import.meta.env.VITE_BASEURL}${product.image?.startsWith("/") ? "" : "/"}${product.image}`;
+
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* 🔝 TOP BAR (WEBSITE STYLE BACK) */}
+      {/* 🔝 TOP BAR */}
       <div className="flex items-center gap-4 mx-6 py-5 mb-6">
         <button
           onClick={handleBack}
-          className="flex items-center gap-2
-      text-slate-700 hover:text-slate-900
-      font-medium"
+          className="flex items-center gap-2 text-slate-700 hover:text-slate-900 font-medium"
         >
           <FaArrowLeft />
-          <span className="text-slate-500 text-sm">
-            Back
-          </span>
+          <span className="text-slate-500 text-sm">Back</span>
         </button>
       </div>
 
@@ -118,7 +110,7 @@ const SingleProduct = () => {
         {/* IMAGE */}
         <div className="bg-white rounded-2xl shadow p-6 flex items-center justify-center">
           <img
-            src={product.image}
+            src={imgSrc}
             alt={product.name}
             className="max-h-96 object-contain"
           />
@@ -128,47 +120,38 @@ const SingleProduct = () => {
         <div className="space-y-4">
           <h1 className="text-3xl font-bold">{product.name}</h1>
 
-          <p className="text-slate-500 text-sm uppercase">
-            {product.category}
-          </p>
+          <p className="text-slate-500 text-sm uppercase">{product.category}</p>
 
           <div className="flex items-center gap-3 text-xl">
             <PiCurrencyInrLight />
             {product.discountedPrice ? (
               <>
-                <del className="text-slate-400">
-                  {product.originalPrice}
-                </del>
+                <del className="text-slate-400">{product.originalPrice}</del>
                 <span className="text-teal-600 font-bold">
                   {product.discountedPrice}
                 </span>
               </>
             ) : (
-              <span className="font-bold">
-                {product.originalPrice}
-              </span>
+              <span className="font-bold">{product.originalPrice}</span>
             )}
           </div>
 
-          <p className="text-slate-600">
-            {product.description}
-          </p>
+          <p className="text-slate-600">{product.description}</p>
 
           <button
             onClick={handleAddToCart}
             disabled={alreadyInCart || btnLoading}
-            className={`mt-4 px-6 py-3 rounded-lg font-semibold
-              ${alreadyInCart
+            className={`mt-4 px-6 py-3 rounded-lg font-semibold ${
+              alreadyInCart
                 ? "bg-slate-300 cursor-not-allowed"
                 : "bg-teal-600 hover:bg-teal-700 text-white"
-              }
-            `}
+            }`}
           >
             {btnLoading
               ? "Adding..."
               : alreadyInCart
-                ? "Already in Cart"
-                : "Add to Cart"}
+              ? "Already in Cart"
+              : "Add to Cart"}
           </button>
         </div>
       </div>
