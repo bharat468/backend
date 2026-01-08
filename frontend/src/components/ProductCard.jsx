@@ -1,17 +1,21 @@
 import { PiCurrencyInrLight } from "react-icons/pi";
 import { FaImage } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import instance from "../axiosConfig";
 import { useState } from "react";
 
 function ProductCard({ product, slug }) {
   const [imgLoading, setImgLoading] = useState(true);
 
+  // Correct Image URL
+  const imgSrc = product.image?.startsWith("http")
+    ? product.image
+    : `${import.meta.env.VITE_BASEURL}${product.image?.startsWith("/") ? "" : "/"}${product.image}`;
+
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group">
 
       {/* IMAGE */}
-      <Link to={`/product/${slug}`} className="block relative h-56 ">
+      <Link to={`/product/${slug}`} className="block relative h-56">
 
         {/* IMAGE LOADER */}
         {imgLoading && (
@@ -21,11 +25,13 @@ function ProductCard({ product, slug }) {
         )}
 
         <img
-          src={product.image}
+          src={imgSrc}
           alt={product.name}
           onLoad={() => setImgLoading(false)}
-          className={`w-full h-56 object-contain transition-transform duration-300 group-hover:scale-105 ${imgLoading ? "opacity-0" : "opacity-100"
-            }`}
+          onError={() => setImgLoading(false)}
+          className={`w-full h-56 object-contain transition-transform duration-300 group-hover:scale-105 ${
+            imgLoading ? "opacity-0" : "opacity-100"
+          }`}
         />
       </Link>
 
