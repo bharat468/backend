@@ -38,7 +38,7 @@ function Header() {
           onClick={() => setMenuOpen(false)}
           className="text-2xl font-bold text-white tracking-wide"
         >
-          LIMESTONE WATCH
+          Bharat E-commerce
         </Link>
 
         {/* MOBILE MENU ICON */}
