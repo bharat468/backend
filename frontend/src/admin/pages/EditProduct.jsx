@@ -10,6 +10,7 @@ function EditProduct() {
   const imageRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
+  const [categorys, setCategorys] = useState([]);
   const [btnLoading, setBtnLoading] = useState(false);
 
   const [data, setData] = useState({
@@ -22,6 +23,20 @@ function EditProduct() {
     image: null,
     oldImage: "",
   });
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+
+  async function fetchCategories() {
+    try {
+      const res = await instance.get("/category");
+      setCategorys(res.data);
+    } catch (error) {
+      console.log("Category fetch error:", error);
+    }
+  }
 
   /* ================= BACK ================= */
   function handleBack() {
@@ -193,13 +208,21 @@ function EditProduct() {
             <label className="block text-sm font-semibold mb-1">
               Category
             </label>
-            <input
-              type="text"
+            <select
               name="category"
               value={data.category}
               onChange={handleChange}
+              required
               className="w-full px-4 py-3 border rounded-lg bg-slate-100"
-            />
+            >
+              <option value="">Select Category</option>
+              {categorys.map((c) => (
+                <option key={c._id} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+
           </div>
 
           {/* DESCRIPTION */}

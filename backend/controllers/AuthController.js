@@ -23,9 +23,7 @@ export async function sendOtp(req, res) {
     const otp = Math.floor(100000 + Math.random() * 900000);
     console.log(otp)
     const otpHash = await bcrypt.hash(otp.toString(), 10);
-    // console.log(otpHash)
 
-    // 🔹 Save OTP in DB (replace old one)
     await OTP.findOneAndUpdate(
       { email },
       { email, otpHash, expiresAt: Date.now() + 5 * 60 * 1000 },

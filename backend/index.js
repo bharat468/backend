@@ -9,6 +9,7 @@ import checkRouter from "./routes/check.js";
 import cartRouter from "./routes/cart.js";
 import cookieParser from "cookie-parser";
 import couponRoutes from "./routes/couponRoutes.js";
+import categoryRouter from "./routes/categoryRouter.js";
 
 
 const frontendUrl = process.env.FRONTEND_URL 
@@ -33,6 +34,7 @@ app.use("/check", checkRouter);
 app.use("/uploads", express.static("uploads"));
 app.use("/cart", cartRouter);
 app.use("/coupon", couponRoutes);
+app.use("/category", categoryRouter)
 
 
 app.listen(3000, () => console.log("Server started at port 3000"));

@@ -23,6 +23,7 @@ import ProtectedRouters from "./admin/components/ProtectedRouters";
 import AuthProvider from "./contexts/AuthProvider";
 import { CartProvider } from "./contexts/CartContext";
 import About from "./pages/About";
+import AddCategory from "./admin/pages/AddCategory";
 
 const router = createBrowserRouter([
   {
@@ -109,6 +110,10 @@ const router = createBrowserRouter([
       {
         path: "coupon/edit/:id",
         element: <EditCoupon />
+      },
+      {
+        path: "category/add",
+        element: <AddCategory/>
       },
     ],
   },

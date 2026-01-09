@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { FaShoppingBag } from "react-icons/fa";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 
 function AddProduct() {
@@ -19,11 +20,26 @@ function AddProduct() {
     image: null,
   });
 
+
   const [loading, setLoading] = useState(false);
+  const [categorys, setCategorys] = useState([])
   const navigate = useNavigate();
 
 
-  /* ---------------- INPUT CHANGE ---------------- */
+  useEffect(() => {
+    fatchCetegorys()
+  }, [])
+
+  async function fatchCetegorys() {
+    try {
+      const res = await instance.get("/category")
+      setCategorys(res.data)
+    } catch (error) {
+      console.log("categorys fatch error")
+    }
+  }
+
+
   function handleChange(e) {
     const { name, value, files } = e.target;
 
@@ -120,25 +136,25 @@ function AddProduct() {
     }
   }
 
-    function handleBack() {
+  function handleBack() {
     navigate(-1);
   }
 
   return (
     <div className="min-h-screen bg-slate-100 p-6">
       <div className="flex items-center gap-4 m-6 mb-6">
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-2
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2
             text-slate-700 hover:text-slate-900
             font-medium"
-              >
-                <FaArrowLeft />
-                <span className="text-slate-500 text-sm">
-                  Back
-                </span>
-              </button>
-            </div>
+        >
+          <FaArrowLeft />
+          <span className="text-slate-500 text-sm">
+            Back
+          </span>
+        </button>
+      </div>
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border p-8">
 
         <h2 className="text-3xl font-bold text-slate-800 mb-6">
@@ -182,16 +198,20 @@ function AddProduct() {
             <label className="block text-sm font-semibold mb-1">
               Category
             </label>
-            <input
-              type="text"
+            <select
               name="category"
               value={data.category}
               onChange={handleChange}
-              minLength={3}
-              maxLength={50}
               required
               className="w-full px-4 py-3 border rounded-lg bg-slate-100"
-            />
+            >
+              <option value="">Select Category</option>
+              {categorys.map((c) => (
+                <option key={c._id} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* DESCRIPTION */}
