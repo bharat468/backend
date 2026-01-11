@@ -1,39 +1,28 @@
 import React, { useEffect, useState, useRef } from "react";
 import ProductCard from "../components/ProductCard";
 import instance from "../axiosConfig";
+import { useParams } from "react-router-dom";
 import { FaShoppingBag } from "react-icons/fa";
 
 const count = 8;
 
-const Product = () => {
+function CategoryProducts() {
+  const { category } = useParams();
   const [allProducts, setAllProducts] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+
   const observerRef = useRef(null);
 
-  async function fetchCategories() {
-    try {
-      const res = await instance.get("/category");
-      setCategories(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  useEffect(() => {
+    fetchCategoryProducts();
+  }, [category]);
 
-  async function fetchProducts(category = "all") {
+  async function fetchCategoryProducts() {
     try {
       setLoading(true);
-
-      let url = "/product";
-      if (category !== "all") {
-        url += `?category=${category}`;
-      }
-
-      const res = await instance.get(url);
+      const res = await instance.get(`/product?category=${category}`);
 
       setAllProducts(res.data);
 
@@ -45,15 +34,6 @@ const Product = () => {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    fetchCategories();
-    fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    fetchProducts(selectedCategory);
-  }, [selectedCategory]);
 
   function getRandomProducts(arr, count1) {
     const shuffled = [...arr].sort(() => 0.5 - Math.random());
@@ -91,35 +71,23 @@ const Product = () => {
     <div className="bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-10">
 
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">
-              Best Products For You
-            </h2>
-            <p className="text-slate-500 mt-1">
-              Handpicked items just for you
-            </p>
-          </div>
-
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="border border-slate-300 p-2 rounded-md text-sm"
-          >
-            <option value="all">All Categories</option>
-            {categories.map((c) => (
-              <option key={c._id} value={c.slug}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-slate-800">
+            Category: {category}
+          </h2>
+          <p className="text-slate-500 mt-1">
+            Showing products from {category}
+          </p>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-            <FaShoppingBag className="text-6xl text-teal-600 animate-bounce" />
+            <div className="relative">
+              <FaShoppingBag className="text-6xl text-teal-600 animate-bounce" />
+              <div className="absolute -inset-4 border-2 border-dashed border-teal-400 rounded-full animate-spin"></div>
+            </div>
             <p className="text-slate-500 text-sm tracking-wide">
-              Loading amazing products...
+              Loading category products...
             </p>
           </div>
         ) : (
@@ -143,9 +111,10 @@ const Product = () => {
             <div ref={observerRef} className="h-10"></div>
           </>
         )}
+
       </div>
     </div>
   );
-};
+}
 
-export default Product;
+export default CategoryProducts;

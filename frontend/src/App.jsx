@@ -24,6 +24,7 @@ import AuthProvider from "./contexts/AuthProvider";
 import { CartProvider } from "./contexts/CartContext";
 import About from "./pages/About";
 import AddCategory from "./admin/pages/AddCategory";
+import CategoryProducts from "./pages/CategoryProducts";
 
 const router = createBrowserRouter([
   {
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
       {
         path: "product/:slug",
         element: <SingleProduct />
+      },
+      {
+        path: "/category/:category",
+        element: <CategoryProducts/>
       },
       {
         path: "cart",

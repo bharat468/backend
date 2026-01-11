@@ -116,7 +116,7 @@ const SingleProduct = () => {
         <div className="space-y-4">
           <h1 className="text-3xl font-bold">{product.name}</h1>
 
-          <p className="text-slate-500 text-sm uppercase">{product.category}</p>
+          <p onClick={() => navigate(`/category/${product.category}`)} className="text-slate-500 text-sm uppercase cursor-pointer hover:text-teal-600">{product.category}</p>
 
           <div className="flex items-center gap-3 text-xl">
             <PiCurrencyInrLight />
@@ -137,17 +137,16 @@ const SingleProduct = () => {
           <button
             onClick={handleAddToCart}
             disabled={alreadyInCart || btnLoading}
-            className={`mt-4 px-6 py-3 rounded-lg font-semibold ${
-              alreadyInCart
-                ? "bg-slate-300 cursor-not-allowed"
-                : "bg-teal-600 hover:bg-teal-700 text-white"
-            }`}
+            className={`mt-4 px-6 py-3 rounded-lg font-semibold ${alreadyInCart
+              ? "bg-slate-300 cursor-not-allowed"
+              : "bg-teal-600 hover:bg-teal-700 text-white"
+              }`}
           >
             {btnLoading
               ? "Adding..."
               : alreadyInCart
-              ? "Already in Cart"
-              : "Add to Cart"}
+                ? "Already in Cart"
+                : "Add to Cart"}
           </button>
         </div>
       </div>

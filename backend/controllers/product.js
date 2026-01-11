@@ -44,7 +44,14 @@ export async function getSingleProduct(req, res) {
 
 export async function getProduct(req, res) {
   try {
-    const products = await Product.find();
+    const { category } = req.query;
+
+    let filter = {};
+    if (category) {
+      filter.category = category;
+    }
+
+    const products = await Product.find(filter);
     return res.status(200).json(products);
   } catch (error) {
     return res.status(500).json({ message: error.message });

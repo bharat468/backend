@@ -225,12 +225,25 @@ function AddProduct() {
               onChange={handleChange}
               maxLength={500}
               rows={4}
-              className="w-full px-4 py-3 border rounded-lg bg-slate-100"
+              className={`w-full px-4 py-3 border rounded-lg bg-slate-100 
+      ${data.description.length > 0 && data.description.length < 10 ? "border-red-500" : ""}`}
             />
-            <p className="text-xs text-slate-400 text-right">
-              {data.description.length}/500
-            </p>
+
+            <div className="flex justify-between text-xs mt-1">
+              {/* Character count */}
+              <span className="text-slate-400">
+                {data.description.length}/500
+              </span>
+
+              {/* Error message */}
+              {data.description.length > 0 && data.description.length < 10 && (
+                <span className="text-red-500 font-semibold">
+                  Minimum 10 characters required
+                </span>
+              )}
+            </div>
           </div>
+
 
           {/* PRICES */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
