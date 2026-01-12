@@ -1,5 +1,9 @@
 import Product from "../models/productmodel.js";
 import cloudinary from "../middlewares/cloudinary.js"
+import groq from "../utils/geminiClient.js";
+
+
+
 
 /* ================= ADD PRODUCT ================= */
 export async function addProduct(req, res) {
@@ -131,3 +135,25 @@ export async function checkSlug(req, res) {
     return res.status(500).json({ message: error.message });
   }
 }
+
+
+export async function suggestRelated(req, res) {
+  try {
+    const { title, category } = req.body;
+
+    // Just find same category products except itself
+    const related = await Product.find({
+      category,
+      name: { $ne: title }
+    }).limit(6);
+
+    return res.status(200).json(related);
+  } catch (error) {
+    console.log("Related error:", error);
+    return res.status(500).json({ message: "Suggestion failed" });
+  }
+}
+
+
+
+

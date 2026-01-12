@@ -5,6 +5,7 @@ import {
   deleteProduct,
   getProduct,
   getSingleProduct,
+  suggestRelated,
   updateProduct
 } from "../controllers/product.js";
 
@@ -31,5 +32,7 @@ productRouter.get("/checkslug/:slug", checkSlug);
 productRouter.post("/", upload.single("image"), addProduct);
 productRouter.put("/:slug", upload.single("image"), updateProduct);
 productRouter.delete("/:slug", deleteProduct);
+productRouter.post("/related", suggestRelated);
+
 
 export default productRouter;

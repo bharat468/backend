@@ -10,7 +10,7 @@ import cartRouter from "./routes/cart.js";
 import cookieParser from "cookie-parser";
 import couponRoutes from "./routes/couponRoutes.js";
 import categoryRouter from "./routes/categoryRouter.js";
-
+import chatRouter from "./routes/chatRouter.js";
 
 const frontendUrl = process.env.FRONTEND_URL 
 
@@ -35,6 +35,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/cart", cartRouter);
 app.use("/coupon", couponRoutes);
 app.use("/category", categoryRouter)
+app.use("/chat", chatRouter);
 
 
 app.listen(3000, () => console.log("Server started at port 3000"));

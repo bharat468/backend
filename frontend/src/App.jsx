@@ -25,6 +25,7 @@ import { CartProvider } from "./contexts/CartContext";
 import About from "./pages/About";
 import AddCategory from "./admin/pages/AddCategory";
 import CategoryProducts from "./pages/CategoryProducts";
+// import AIChatBox from "./components/AIChatBox";
 
 const router = createBrowserRouter([
   {
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/category/:category",
-        element: <CategoryProducts/>
+        element: <CategoryProducts />
       },
       {
         path: "cart",
@@ -118,7 +119,7 @@ const router = createBrowserRouter([
       },
       {
         path: "category/add",
-        element: <AddCategory/>
+        element: <AddCategory />
       },
     ],
   },
@@ -128,6 +129,7 @@ function App() {
   return (
     <AuthProvider>
       <RouterProvider router={router} />
+      {/* <AIChatBox /> */}
     </AuthProvider>
   );
 }
