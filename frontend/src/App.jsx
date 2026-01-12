@@ -25,7 +25,7 @@ import { CartProvider } from "./contexts/CartContext";
 import About from "./pages/About";
 import AddCategory from "./admin/pages/AddCategory";
 import CategoryProducts from "./pages/CategoryProducts";
-// import AIChatBox from "./components/AIChatBox";
+import AIChatBox from "./components/AIChatBox";
 
 const router = createBrowserRouter([
   {
@@ -129,7 +129,7 @@ function App() {
   return (
     <AuthProvider>
       <RouterProvider router={router} />
-      {/* <AIChatBox /> */}
+      <AIChatBox />
     </AuthProvider>
   );
 }
