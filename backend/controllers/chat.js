@@ -1,6 +1,5 @@
 import groq from "../utils/geminiClient.js";
 
-
 export async function chatAI(req, res) {
   try {
     const { message } = req.body;
@@ -14,36 +13,15 @@ export async function chatAI(req, res) {
       messages: [
         {
           role: "system",
-          content: `
-You are an ecommerce assistant.
-
-⚠️ ALWAYS reply ONLY using Markdown:
-
-### 📌 Heading Title
-
-**Top Suggestions**
-- Bullet item 1
-- Bullet item 2
-- Bullet item 3
-
-**Extra Tips**
-- Bullet item 4
-- Bullet item 5
-
-**Question**
-- Ask one short question
-
-Never reply as paragraph text.
-Never remove dashes.
-Use Hindi + English mixed style.
-`,
+          content: `You are a helpful ecommerce assistant. Reply in clear, simple English.`,
         },
         { role: "user", content: message },
       ],
-      temperature: 0.4,
+      temperature: 0.6,
     });
 
-    const reply = completion.choices?.[0]?.message?.content?.trim() || "No reply";
+    const reply =
+      completion.choices?.[0]?.message?.content?.trim() || "No reply";
 
     return res.status(200).json({ reply });
   } catch (error) {
@@ -51,7 +29,6 @@ Use Hindi + English mixed style.
     return res.status(500).json({ reply: "Server issue! Try again 😐" });
   }
 }
-
 
 export async function listModels(req, res) {
   try {

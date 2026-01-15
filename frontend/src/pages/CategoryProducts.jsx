@@ -19,7 +19,7 @@ function CategoryProducts() {
     fetchCategoryProducts();
   }, [category]);
 
-  async function fetchCategoryProducts() {
+  async function fetchCategoryProducts() { 
     try {
       setLoading(true);
       const res = await instance.get(`/product?category=${category}`);
