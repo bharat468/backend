@@ -96,9 +96,9 @@ function About() {
       </section>
 
       {/* FOOT NOTE */}
-      <section className="text-center py-10 text-slate-500 text-sm">
+      {/* <section className="text-center py-10 text-slate-500 text-sm">
         © {new Date().getFullYear()} Limestone Watch. All rights reserved.
-      </section>
+      </section> */}
     </div>
   );
 }
