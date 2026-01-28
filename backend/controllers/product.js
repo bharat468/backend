@@ -21,7 +21,7 @@ export async function addProduct(req, res) {
 
     return res.status(201).json(newProduct);
   } catch (error) {
-    console.log(error)
+    console.log(error) 
     return res.status(500).json({ message: error.message });
   }
 }
