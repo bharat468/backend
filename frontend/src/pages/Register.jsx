@@ -18,12 +18,6 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // ===== OTP STATES (COMMENTED) =====
-  // const [otp, setOtp] = useState("");
-  // const [otpSent, setOtpSent] = useState(false);
-  // const [verified, setVerified] = useState(false);
-  // const [timer, setTimer] = useState(0);
-
   function handleChange(e) {
     const { name, value } = e.target;
 
@@ -33,58 +27,8 @@ function Register() {
     setData({ ...data, [name]: value });
   }
 
-  // ===== SEND OTP (COMMENTED) =====
-  /*
-  async function sendOTP() {
-    try {
-      if (!data.email || !data.username || !data.phone) {
-        return toast.warning("Fill email, phone & username first");
-      }
-
-      await instance.post("/user/send-otp", {
-        email: data.email,
-        username: data.username,
-        phone: data.phone,
-      });
-
-      toast.success("OTP sent ✉️");
-      setOtpSent(true);
-
-      setTimer(30);
-      const interval = setInterval(() => {
-        setTimer((t) => {
-          if (t <= 1) clearInterval(interval);
-          return t - 1;
-        });
-      }, 1000);
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to send OTP");
-    }
-  }
-  */
-
-  // ===== VERIFY OTP (COMMENTED) =====
-  /*
-  async function verifyOTP() {
-    try {
-      await instance.post("/user/verify-otp", {
-        email: data.email,
-        otp,
-      });
-
-      setVerified(true);
-      toast.success("Verified 🎉");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Wrong OTP ❌");
-    }
-  }
-  */
-
   async function handleSubmit(e) {
     e.preventDefault();
-
-    // ===== OTP CHECK REMOVED =====
-    // if (!verified) return toast.warning("Please verify OTP first ❌");
 
     const { name, phone, username, email, password } = data;
 
@@ -120,7 +64,6 @@ function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border p-8">
-
         <h2 className="text-center text-3xl font-bold text-slate-800">
           Create Account
         </h2>
@@ -129,7 +72,6 @@ function Register() {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-
           <input
             type="text"
             name="name"
@@ -198,7 +140,6 @@ function Register() {
           >
             Already have an account? Login
           </Link>
-
         </form>
       </div>
     </div>
