@@ -74,6 +74,15 @@ function Header() {
             About
           </Link>
 
+          <Link
+                to="/admin/home"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 text-slate-200 hover:text-white"
+              >
+                <FaUser /> admin
+              </Link>
+
+
           {!isLoggedIn && (
             <>
               <Link
