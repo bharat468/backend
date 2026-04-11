@@ -5,10 +5,13 @@ import "dotenv/config" // ye aapni env fill ko read krti hai or process.env
 
 async function connectToDB() {
     try {
-        await mongoose.connect(process.env.MONGO_URL)
+        // console.log("MONGO_URL:", process.env.MONGO_URL);
+
+        await mongoose.connect(process.env.MONGO_URL);
+        console.log("✅ database connecting successful");
     }
     catch (error) {
-        console.log("error connecting to database:", error)
+        console.log("❌ error connecting to database:", error);
     }
 }
 
