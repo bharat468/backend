@@ -25,7 +25,8 @@ app.use(
   })
 );
 
-// Routes
+ connectToDB();
+
 app.use("/product", productRouter);
 app.use("/user", authRouter);
 app.use("/admin", adminRouter);
@@ -36,16 +37,5 @@ app.use("/coupon", couponRoutes);
 app.use("/category", categoryRouter)
 app.use("/chat", chatRouter);
 
-// Connect to DB and start server
-connectToDB()
-  .then(() => {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`✅ Server started at port ${PORT}`);
-      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    });
-  })
-  .catch((error) => {
-    console.error("❌ Failed to start server:", error.message);
-    process.exit(1);
-  });
+
+app.listen(3000, () => console.log("Server started at port 3000"));
