@@ -8,6 +8,11 @@ export async function registerUser(req, res) {
   try {
     const { name, email, phone, username, password } = req.body;
 
+    // Validate required fields
+    if (!name || !email || !phone || !username || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     if (await Auth.findOne({ email }))
       return res.status(400).json({ message: "Email already registered" });
 
@@ -29,15 +34,28 @@ export async function registerUser(req, res) {
       blocked: false,
     });
 
-    await sendWelcomeEmail(email, name);
+    // Try to send welcome email but don't fail registration if it fails
+    try {
+      await sendWelcomeEmail(email, name);
+    } catch (emailError) {
+      console.error("Failed to send welcome email:", emailError);
+    }
 
     res.status(201).json({
       message: "User registered successfully",
-      user: newUser,
+      user: {
+        _id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        username: newUser.username,
+        phone: newUser.phone,
+        role: newUser.role
+      },
     });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Registration error:", error);
+    res.status(500).json({ message: error.message || "Registration failed" });
   }
 }
 
@@ -45,6 +63,11 @@ export async function registerUser(req, res) {
 export async function loginUser(req, res) {
   try {
     const { email, password } = req.body;
+
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
+    }
 
     const user = await Auth.findOne({ email });
     if (!user)
@@ -60,25 +83,33 @@ export async function loginUser(req, res) {
       return res.status(400).json({ message: "Invalid password" });
 
     const auth_token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role || "user" },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     res.cookie("auth_token", auth_token, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: process.env.sameSite || "lax",
       maxAge: 3600 * 1000,
     });
 
     res.status(200).json({
       message: "Login successful",
-      user,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        phone: user.phone,
+        role: user.role
+      },
     });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Login error:", error);
+    res.status(500).json({ message: error.message || "Login failed" });
   }
 }
 
@@ -87,13 +118,14 @@ export async function logoutUser(req, res) {
   try {
     res.clearCookie("auth_token", {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: process.env.sameSite || "lax",
     });
 
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Logout error:", error);
+    res.status(500).json({ message: error.message || "Logout failed" });
   }
 }
 

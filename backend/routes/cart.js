@@ -4,14 +4,29 @@ import {
   addToCart,
   getCart,
   updateCartQty,
-  removeCartItem
+  removeCartItem,
+  clearCart,
+  getCartCount
 } from "../controllers/cartcontrollers.js";
 
 const cartRouter = Router();
 
-cartRouter.get("/", checkAuth, getCart);         
-cartRouter.post("/add", checkAuth, addToCart);   
-cartRouter.put("/update", checkAuth, updateCartQty); 
-cartRouter.delete("/remove/:cartId", checkAuth, removeCartItem); 
+// Get user's cart
+cartRouter.get("/", checkAuth, getCart);
+
+// Get cart count
+cartRouter.get("/count", checkAuth, getCartCount);
+
+// Add product to cart
+cartRouter.post("/add", checkAuth, addToCart);
+
+// Update cart item quantity
+cartRouter.put("/update", checkAuth, updateCartQty);
+
+// Remove item from cart
+cartRouter.delete("/remove/:cartId", checkAuth, removeCartItem);
+
+// Clear entire cart
+cartRouter.delete("/clear", checkAuth, clearCart);
 
 export default cartRouter;

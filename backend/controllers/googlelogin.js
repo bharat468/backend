@@ -26,19 +26,20 @@ export const googleLogin = async (req, res) => {
         googleId: sub,
         image: picture,
         authProvider: "google",
+        role: "user",
       });
     }
 
     // LOGIN
     const authToken = jwt.sign(
-      { id: user._id },
+      { id: user._id, role: user.role || "user" },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
     res.cookie("auth_token", authToken, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: process.env.sameSite || "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });

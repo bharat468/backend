@@ -1,19 +1,16 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
+import { SkeletonGrid } from "../components/SkeletonCard";
 import instance from "../axiosConfig";
-import { useParams } from "react-router-dom";
-import { FaShoppingBag } from "react-icons/fa";
-
-const count = 8;
+import { useParams, Link } from "react-router-dom";
+import { FaShoppingBag, FaArrowLeft } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 function CategoryProducts() {
   const { category } = useParams();
   const [allProducts, setAllProducts] = useState([]);
-  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-
-  const observerRef = useRef(null);
 
   useEffect(() => {
     fetchCategoryProducts();
@@ -23,11 +20,12 @@ function CategoryProducts() {
     try {
       setLoading(true);
       const res = await instance.get(`/product?category=${category}`);
-
       setAllProducts(res.data);
 
-      const firstBatch = getRandomProducts(res.data, count);
-      setVisibleProducts(firstBatch);
+      // Get category name
+      const catRes = await instance.get("/category");
+      const foundCat = catRes.data.find(c => c.slug === category);
+      setCategoryName(foundCat?.name || category);
     } catch (err) {
       console.log(err);
     } finally {
@@ -35,81 +33,72 @@ function CategoryProducts() {
     }
   }
 
-  function getRandomProducts(arr, count1) {
-    const shuffled = [...arr].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count1);
-  }
-
-  function loadMoreProducts() {
-    if (loadingMore) return;
-
-    setLoadingMore(true);
-
-    setTimeout(() => {
-      const more = getRandomProducts(allProducts, count);
-      setVisibleProducts(prev => [...prev, ...more]);
-      setLoadingMore(false);
-    }, 400);
-  }
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          loadMoreProducts();
-        }
-      },
-      { threshold: 1 }
-    );
-
-    if (observerRef.current) observer.observe(observerRef.current);
-
-    return () => observer.disconnect();
-  }, [allProducts, loadingMore]);
-
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-10">
+    <div className="min-h-screen bg-slate-950 py-8 xs:py-10 sm:py-12">
+      <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
 
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-800">
-            Category: {category}
-          </h2>
-          <p className="text-slate-500 mt-1">
-            Showing products from {category}
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 xs:mb-8"
+        >
+          <Link
+            to="/"
+            className="inline-flex items-center space-x-2 text-sm xs:text-base text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 mb-3 xs:mb-4 transition-colors"
+          >
+            <FaArrowLeft className="text-sm xs:text-base" />
+            <span>Back to Home</span>
+          </Link>
+
+          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">
+            {categoryName} <span className="gradient-text">Collection</span>
+          </h1>
+          <p className="text-sm xs:text-base text-gray-400">
+            {loading ? "Loading..." : `${allProducts.length} products available`}
           </p>
-        </div>
+        </motion.div>
 
+        {/* Products Grid */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-            <div className="relative">
-              <FaShoppingBag className="text-6xl text-teal-600 animate-bounce" />
-              <div className="absolute -inset-4 border-2 border-dashed border-teal-400 rounded-full animate-spin"></div>
+          <SkeletonGrid count={8} />
+        ) : allProducts.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center min-h-[50vh] xs:min-h-[60vh] gap-4 xs:gap-6 px-4"
+          >
+            <div className="w-24 h-24 xs:w-32 xs:h-32 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
+              <FaShoppingBag className="text-4xl xs:text-5xl md:text-6xl text-white" />
             </div>
-            <p className="text-slate-500 text-sm tracking-wide">
-              Loading category products...
-            </p>
-          </div>
+            <div className="text-center">
+              <h3 className="text-xl xs:text-2xl font-bold text-white mb-2">
+                No Products Found
+              </h3>
+              <p className="text-sm xs:text-base text-gray-400 mb-4 xs:mb-6">
+                This category doesn't have any products yet
+              </p>
+              <Link to="/">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 xs:px-8 py-2.5 xs:py-3 text-sm xs:text-base btn-premium text-white font-semibold rounded-full"
+                >
+                  Browse All Products
+                </motion.button>
+              </Link>
+            </div>
+          </motion.div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {visibleProducts.map((product, index) => (
-                <ProductCard
-                  key={`${product._id}-${index}`}
-                  product={product}
-                  slug={product.slug}
-                />
-              ))}
-            </div>
-
-            {loadingMore && (
-              <div className="flex justify-center py-10">
-                <FaShoppingBag className="text-4xl text-teal-600 animate-bounce" />
-              </div>
-            )}
-
-            <div ref={observerRef} className="h-10"></div>
-          </>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 xs:gap-4 md:gap-6">
+            {allProducts.map((product) => (
+              <ProductCard
+                key={product._id}
+                product={product}
+                slug={product.slug}
+              />
+            ))}
+          </div>
         )}
 
       </div>

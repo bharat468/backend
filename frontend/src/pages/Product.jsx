@@ -1,19 +1,17 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
+import { SkeletonGrid } from "../components/SkeletonCard";
 import instance from "../axiosConfig";
-import { FaShoppingBag } from "react-icons/fa";
-
-const count = 8;
+import { FaShoppingBag, FaFilter } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Product = () => {
   const [allProducts, setAllProducts] = useState([]);
-  const [visibleProducts, setVisibleProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
-
+  const [sortBy, setSortBy] = useState("default");
+  const [showFilters, setShowFilters] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const observerRef = useRef(null);
 
   async function fetchCategories() {
     try {
@@ -34,11 +32,20 @@ const Product = () => {
       }
 
       const res = await instance.get(url);
+      let products = res.data;
 
-      setAllProducts(res.data);
+      // Apply sorting
+      if (sortBy === "price-low") {
+        products = products.sort((a, b) => 
+          (a.discountedPrice || a.originalPrice) - (b.discountedPrice || b.originalPrice)
+        );
+      } else if (sortBy === "price-high") {
+        products = products.sort((a, b) => 
+          (b.discountedPrice || b.originalPrice) - (a.discountedPrice || a.originalPrice)
+        );
+      }
 
-      const firstBatch = getRandomProducts(res.data, count);
-      setVisibleProducts(firstBatch);
+      setAllProducts(products);
     } catch (err) {
       console.log(err);
     } finally {
@@ -53,97 +60,119 @@ const Product = () => {
 
   useEffect(() => {
     fetchProducts(selectedCategory);
-  }, [selectedCategory]);
-
-  function getRandomProducts(arr, count1) {
-    const shuffled = [...arr].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count1);
-  }
-
-  function loadMoreProducts() {
-    if (loadingMore) return;
-
-    setLoadingMore(true);
-
-    setTimeout(() => {
-      const more = getRandomProducts(allProducts, count);
-      setVisibleProducts(prev => [...prev, ...more]);
-      setLoadingMore(false);
-    }, 400);
-  }
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          loadMoreProducts();
-        }
-      },
-      { threshold: 1 }
-    );
-
-    if (observerRef.current) observer.observe(observerRef.current);
-
-    return () => observer.disconnect();
-  }, [allProducts, loadingMore]);
+  }, [selectedCategory, sortBy]);
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-6 py-10">
-
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="min-h-screen">
+      {/* Header Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h2 className="text-2xl font-bold text-slate-800">
-              Best Products For You
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+              Featured <span className="gradient-text">Products</span>
             </h2>
-            <p className="text-slate-500 mt-1">
-              Handpicked items just for you
+            <p className="text-gray-600 dark:text-gray-400">
+              Discover our handpicked collection of premium products
             </p>
           </div>
 
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="border border-slate-300 p-2 rounded-md text-sm"
+          {/* Filter Toggle Button (Mobile) */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowFilters(!showFilters)}
+            className="md:hidden flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full font-semibold shadow-lg"
           >
-            <option value="all">All Categories</option>
-            {categories.map((c) => (
-              <option key={c._id} value={c.slug}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            <FaFilter />
+            <span>Filters</span>
+          </motion.button>
         </div>
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-            <FaShoppingBag className="text-6xl text-teal-600 animate-bounce" />
-            <p className="text-slate-500 text-sm tracking-wide">
-              Loading amazing products...
+        {/* Filters Section */}
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-6 flex flex-col sm:flex-row gap-4 md:flex"
+            >
+              {/* Category Filter */}
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Category
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                >
+                  <option value="all">All Categories</option>
+                  {categories.map((c) => (
+                    <option key={c._id} value={c.slug}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sort Filter */}
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Sort By
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                >
+                  <option value="default">Default</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="newest">Newest First</option>
+                </select>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Products Grid */}
+      {loading ? (
+        <SkeletonGrid count={8} />
+      ) : allProducts.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center justify-center min-h-[60vh] gap-6"
+        >
+          <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
+            <FaShoppingBag className="text-6xl text-white" />
+          </div>
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              No Products Found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Try adjusting your filters or check back later
             </p>
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {visibleProducts.map((product, index) => (
-                <ProductCard
-                  key={`${product._id}-${index}`}
-                  product={product}
-                  slug={product.slug}
-                />
-              ))}
-            </div>
-
-            {loadingMore && (
-              <div className="flex justify-center py-10">
-                <FaShoppingBag className="text-4xl text-teal-600 animate-bounce" />
-              </div>
-            )}
-
-            <div ref={observerRef} className="h-10"></div>
-          </>
-        )}
-      </div>
+        </motion.div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {allProducts.map((product, index) => (
+            <ProductCard
+              key={product._id}
+              product={product}
+              slug={product.slug}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -6,6 +6,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import SingleProduct from "./pages/SingleProduct";
 import Cart from "./pages/Cart";
+import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import CategoryProducts from "./pages/CategoryProducts";
 
 import AdminLogin from "./admin/pages/AdminLogin";
 import AdminHome from "./admin/pages/AdminHome";
@@ -16,16 +19,15 @@ import UserList from "./admin/pages/UserList";
 import EditProduct from "./admin/pages/EditProduct";
 import CouponList from "./admin/pages/CouponList";
 import EditCoupon from "./admin/pages/EditCoupon";
+import AddCategory from "./admin/pages/AddCategory";
 
 import AdminLayout from "./admin/components/AdminLayout";
 import ProtectedRouters from "./admin/components/ProtectedRouters";
 
 import AuthProvider from "./contexts/AuthProvider";
 import { CartProvider } from "./contexts/CartContext";
-import About from "./pages/About";
-import AddCategory from "./admin/pages/AddCategory";
-import CategoryProducts from "./pages/CategoryProducts";
-import AIChatBox from "./components/AIChatBox";
+import ErrorBoundary from "./components/ErrorBoundary";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -53,18 +55,25 @@ const router = createBrowserRouter([
         element: <SingleProduct />
       },
       {
-        path: "/category/:category",
+        path: "category/:category",
         element: <CategoryProducts />
       },
       {
         path: "cart",
-        element: <Cart />
+        element: (
+          <ProtectedRoute>
+            <Cart />
+          </ProtectedRoute>
+        )
       },
       {
         path: "about",
         element: <About />
       },
-
+      {
+        path: "*",
+        element: <NotFound />
+      },
     ],
   },
 
@@ -127,10 +136,11 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <AIChatBox />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

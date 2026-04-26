@@ -4,7 +4,14 @@ import instance from "../axiosConfig";
 const authContext = createContext();
 
 function AuthProvider({ children }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Initialize from localStorage to prevent flash
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const stored = localStorage.getItem("isLoggedIn");
+    return stored === "true";
+  });
+
+  // Loading state - starts true until API check completes
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkIsLoggedIn();
@@ -12,15 +19,21 @@ function AuthProvider({ children }) {
 
   async function checkIsLoggedIn() {
     try {
+      setLoading(true);
       const res = await instance.get("/check/login?referer=user");
-      setIsLoggedIn(res.data.loggedIn === true);
+      const loggedIn = res.data.loggedIn === true;
+      setIsLoggedIn(loggedIn);
+      localStorage.setItem("isLoggedIn", String(loggedIn));
     } catch {
       setIsLoggedIn(false);
+      localStorage.setItem("isLoggedIn", "false");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <authContext.Provider value={{ isLoggedIn, setIsLoggedIn, checkIsLoggedIn }}>
+    <authContext.Provider value={{ isLoggedIn, setIsLoggedIn, checkIsLoggedIn, loading, setLoading }}>
       {children}
     </authContext.Provider>
   );
